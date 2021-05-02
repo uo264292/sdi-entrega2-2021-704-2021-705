@@ -1,6 +1,15 @@
 module.exports = function(app, swig, gestorBD) {
-    app.get("/usuarios", function(req, res) {
-        res.send("ver usuarios");
+
+    app.get("/usuarios",function(req,res) {
+        let u = [{
+            "email": "admin@email.es",
+            "nombre": "admin",
+            "apellidos": "admin"
+        }]
+        let respuesta = swig.renderFile('views/usuarios.html', {
+            usuarios: u
+        });
+        res.send(respuesta)
     });
 
     app.get("/registrarse", function(req, res) {
@@ -48,7 +57,7 @@ module.exports = function(app, swig, gestorBD) {
 
             } else {
                 req.session.usuario = usuarios[0].email;
-                res.redirect("/publicaciones");
+                res.redirect("/usuarios");
             }
         });
     });
