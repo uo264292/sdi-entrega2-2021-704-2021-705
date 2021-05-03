@@ -1,15 +1,19 @@
 module.exports = function(app, swig, gestorBD) {
 
     app.get("/usuarios",function(req,res) {
-        let u = [{
-            "email": "admin@email.es",
-            "nombre": "admin",
-            "apellidos": "admin"
-        }]
-        let respuesta = swig.renderFile('views/usuarios.html', {
-            usuarios: u
+
+        let criterio = {};
+        gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+            if (usuarios == null) {
+                res.send("Error al listar ");
+            } else {
+                let respuesta = swig.renderFile('views/usuarios.html',
+                    {
+                        usuarios : usuarios
+                    });
+                res.send(respuesta);
+            }
         });
-        res.send(respuesta)
     });
 
     app.get("/registrarse", function(req, res) {
@@ -17,18 +21,26 @@ module.exports = function(app, swig, gestorBD) {
         res.send(respuesta);
     });
 
-    app.post('/usuario', function(req, res) {
+    app.post('/registrarse', function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
+
         let usuario = {
             email : req.body.email,
+            nombre: req.body.nombre,
+            apellidos: req.body.apellidos,
+            dinero: 100,
             password : seguro
         }
         gestorBD.insertarUsuario(usuario, function(id) {
             if (id == null){
                 res.redirect("/registrarse?mensaje=Error al registrar usuario");
-            } else {
-                res.redirect("/identificarse?mensaje=Nuevo usuario registrado");
+            }
+            if (req.body.password!=req.body.repeatPassword){
+                res.redirect("/registrarse?mensaje=La contraseña no coincide.");
+            }
+            else {
+                res.redirect("/usuarios");
             }
         });
     });
@@ -65,6 +77,17 @@ module.exports = function(app, swig, gestorBD) {
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
         res.send("Usuario desconectado");
+    });
+
+    app.get('/usuario/eliminar/:id', function (req, res) {
+        let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
+        gestorBD.eliminarUsuario(criterio,function(usuarios){
+            if ( usuarios == null ){
+                res.redirect("/usuarios?mensaje=Error al eliminar usuario");
+            } else {
+                res.redirect("/usuarios");
+            }
+        });
     });
 
 };
