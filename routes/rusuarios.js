@@ -68,6 +68,15 @@ module.exports = function(app, swig, gestorBD) {
                // res.redirect("/error");
 
             } else {
+                //if (req.body.nombre.equals("admin@email.com")) {
+                  //  req.session.usuario = usuarios[0].email;
+                    //res.redirect("/usuarios");
+                //}
+                //else{
+                  //  req.session.usuario = usuarios[0].email;
+                   // res.redirect("/ofertas");
+                //}
+
                 req.session.usuario = usuarios[0].email;
                 res.redirect("/usuarios");
             }
