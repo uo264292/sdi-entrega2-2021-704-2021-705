@@ -26,8 +26,58 @@ let gestorBD = require("./modules/gestorBD.js");
 gestorBD.init(app,mongo);
 
 
+// routerUsuarioSession
+var routerUsuarioSession = express.Router();
+routerUsuarioSession.use(function(req, res, next) {
+    console.log("routerUsuarioSession");
+    if ( req.session.usuario ) {
+        // dejamos correr la petición
+        next();
+    } else {
+        console.log("va a : "+req.session.destino)
+        res.redirect("/identificarse");
+    }
+});
+//Aplicar routerUsuarioSession
+app.use("/oferta/agregar",routerUsuarioSession);
+app.use("/ofertas",routerUsuarioSession);
+
+
+//routerUsuarioAutor
+let routerUsuarioAutor = express.Router();
+routerUsuarioAutor.use(function(req, res, next) {
+    console.log("routerUsuarioAutor");
+    let path = require('path');
+    let id = path.basename(req.originalUrl);
+// Cuidado porque req.params no funciona
+// en el router si los params van en la URL.
+    gestorBD.obtenerOferta(
+        {_id: mongo.ObjectID(id) }, function (ofertas) {
+            console.log(ofertas[0]);
+            if(ofertas[0].usuario == req.session.usuario ){
+                next();
+            } else {
+                res.redirect("/ofertas");
+            }
+        })
+});
+//Aplicar routerUsuarioAutor
+app.use("/oferta/modificar",routerUsuarioAutor);
+app.use("/oferta/eliminar",routerUsuarioAutor);
+app.use("/compras",routerUsuarioSession);
+
+
+
+
+
+
 //Rutas/controladores por lógica
 require("./routes/rusuarios.js")(app, swig,gestorBD);
+require("./routes/rofertas")(app,swig,gestorBD);
+
+app.get('/', function (req, res) {
+    res.redirect('/identificarse');
+})
 
 //variables
 app.set('port', 8081);

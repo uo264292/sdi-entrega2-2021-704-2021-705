@@ -55,8 +55,6 @@ module.exports = function(app, swig, gestorBD) {
             .update(req.body.password).digest('hex');
         let criterio = {
             email : req.body.email,
-            nombre: req.body.nombre,
-            apellidos: req.body.apellidos,
             password : seguro
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
