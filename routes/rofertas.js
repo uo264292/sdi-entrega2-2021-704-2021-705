@@ -17,6 +17,22 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
+    app.get("/ofertas/propias",function(req,res) {
+
+        let criterio = {usuario : req.session.usuario};
+        gestorBD.obtenerOferta(criterio, function(ofertas) {
+            if (ofertas == null) {
+                res.send("Error al listar ");
+            } else {
+                let respuesta = swig.renderFile('views/ofertasPropias.html',
+                    {
+                        ofertas : ofertas
+                    });
+                res.send(respuesta);
+            }
+        });
+    });
+
     app.get('/oferta/agregar', function (req,res){
         let respuesta = swig.renderFile('views/addOferta.html',{
         });

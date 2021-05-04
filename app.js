@@ -41,7 +41,8 @@ routerUsuarioSession.use(function(req, res, next) {
 //Aplicar routerUsuarioSession
 app.use("/oferta/agregar",routerUsuarioSession);
 app.use("/ofertas",routerUsuarioSession);
-
+app.use("/usuarios",routerUsuarioSession);
+app.use("/usuarios/eliminar",routerUsuarioSession);
 
 //routerUsuarioAutor
 let routerUsuarioAutor = express.Router();

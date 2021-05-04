@@ -1,7 +1,7 @@
-{% extends "base.html" %} {% block titulo %} Lista de Ofertas {% endblock %}
+{% extends "base.html" %} {% block titulo %} Lista de Mis Ofertas {% endblock %}
 
 {% block contenido_principal %}
-<h2>Lista De Ofertas</h2>
+<h2>Lista De Mis Ofertas</h2>
 
 
 <div class="table-responsive">
@@ -20,6 +20,9 @@
             <td>{{ oferta.titulo }}</td>
             <td>{{ oferta.detalles }}</td>
             <td>{{ oferta.precio }}</td>
+            <td><a href="/oferta/modificar/{{ oferta._id.toString() }}">Modificar</a> <br>
+                <a href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
+            </td>
         </tr>
         {% endfor %}
         </tbody>

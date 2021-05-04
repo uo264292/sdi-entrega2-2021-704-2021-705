@@ -23,7 +23,6 @@ module.exports = {
             }
         });
     },
-
     obtenerOferta : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -77,7 +76,6 @@ module.exports = {
             }
         });
     },
-
     obtenerUsuarios : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
