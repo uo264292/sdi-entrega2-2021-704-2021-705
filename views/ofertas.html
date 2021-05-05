@@ -43,10 +43,12 @@
             <td>{{ oferta.titulo }}</td>
             <td>{{ oferta.detalles }}</td>
             <td>{{ oferta.precio }}€</td>
-            {% if sepuedecomprar %}
+            {% if usuario==oferta.usuario %}
+            <td>Esta oferta es tuya</td>
+            {% elif sepuedecomprar %}
             <td>
-            <a class="btn btn-primary pull-right"
-               href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a>
+                <a class="btn btn-primary pull-right"
+                   href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a>
             </td>
             {% else %}
             <td>Vendido</td>

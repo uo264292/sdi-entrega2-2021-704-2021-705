@@ -37,6 +37,7 @@ module.exports = function(app, swig, gestorBD) {
                         ofertas : ofertas,
                         paginas : paginas,
                         sepuedecomprar: true,
+                        usuario: req.session.usuario,
                         actual : pg
                     });
                 res.send(respuesta);
