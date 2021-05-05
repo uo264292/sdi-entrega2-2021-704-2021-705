@@ -41,6 +41,7 @@ module.exports = function(app, swig, gestorBD) {
                 res.redirect("/registrarse?mensaje=La contraseña no coincide.");
             }
             else {
+                req.session.usuario = usuario.email;
                 res.redirect("/usuarios");
             }
         });
@@ -84,7 +85,7 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
-        res.send("Usuario desconectado");
+        res.redirect("/identificarse");
     });
 
     app.get('/usuario/eliminar/:id', function (req, res) {
