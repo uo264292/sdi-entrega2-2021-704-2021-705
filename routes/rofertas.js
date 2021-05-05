@@ -114,8 +114,9 @@ module.exports = function(app, swig, gestorBD) {
 
         sePuedeComprar(usuario,ofertaID,function (comprar){
             if (comprar){
-                gestorBD.obtenerOferta(ofertaID,function(ofertas){
-                    if (ofertas==null || ofertas.length>0)
+                let criterio = {"_id" : ofertaID};
+                gestorBD.obtenerOferta(criterio,function(ofertas){
+                    if (ofertas==null)
                         res.send("Oferta no comprable.");
                     else{
                         let compra = {

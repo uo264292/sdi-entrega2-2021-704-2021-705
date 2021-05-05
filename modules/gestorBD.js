@@ -12,11 +12,11 @@ module.exports = {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('compras');
-                collection.find(criterio).toArray(function(err, usuarios) {
+                collection.find(criterio).toArray(function(err, compras) {
                     if (err) {
                         funcionCallback(null);
                     } else {
-                        funcionCallback(usuarios);
+                        funcionCallback(compras);
                     }
                     db.close();
                 });
