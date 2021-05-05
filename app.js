@@ -41,8 +41,7 @@ routerUsuarioSession.use(function(req, res, next) {
 //Aplicar routerUsuarioSession
 app.use("/oferta/agregar",routerUsuarioSession);
 app.use("/ofertas",routerUsuarioSession);
-app.use("/usuarios",routerUsuarioSession);
-app.use("/usuarios/eliminar",routerUsuarioSession);
+
 
 //routerUsuarioAutor
 let routerUsuarioAutor = express.Router();
@@ -68,7 +67,23 @@ app.use("/oferta/eliminar",routerUsuarioAutor);
 app.use("/compras",routerUsuarioSession);
 
 
+//routerUsuarioRol
+let routerUsuarioRol = express.Router();
+routerUsuarioRol.use(function(req, res, next) {
+    console.log("routerUsuarioRol");
+    gestorBD.obtenerUsuarios({email : req.session.usuario }, function (usuarios){
+       if (usuarios[0].rol=="admin"){
+           next();
+       }
+       else{
+           res.redirect("/ofertas");
+       }
+    });
 
+});
+//Aplicar routerUsuarioRol
+app.use("/usuarios",routerUsuarioRol);
+app.use("/usuarios/eliminar",routerUsuarioRol);
 
 
 

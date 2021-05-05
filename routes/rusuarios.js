@@ -30,6 +30,7 @@ module.exports = function(app, swig, gestorBD) {
             nombre: req.body.nombre,
             apellidos: req.body.apellidos,
             dinero: 100,
+            rol : "estandar",
             password : seguro
         }
         gestorBD.insertarUsuario(usuario, function(id) {
