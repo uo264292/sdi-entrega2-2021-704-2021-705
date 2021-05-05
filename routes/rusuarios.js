@@ -65,18 +65,8 @@ module.exports = function(app, swig, gestorBD) {
                 res.redirect("/identificarse" +
                     "?mensaje=Email o password incorrecto"+
                     "&tipoMensaje=alert-danger ");
-               // res.redirect("/error");
 
             } else {
-                //if (req.body.nombre.equals("admin@email.com")) {
-                  //  req.session.usuario = usuarios[0].email;
-                    //res.redirect("/usuarios");
-                //}
-                //else{
-                  //  req.session.usuario = usuarios[0].email;
-                   // res.redirect("/ofertas");
-                //}
-
                 req.session.usuario = usuarios[0].email;
                 res.redirect("/usuarios");
             }

@@ -47,15 +47,22 @@ module.exports = function(app, swig, gestorBD) {
         usuario: req.session.usuario
     }
 
-    // Conectarse
-    gestorBD.insertarOferta(oferta, function(id){
-        if (id == null) {
-            res.send("Error al insertar oferta");
-        } else {
-            res.redirect('/ofertas');
-            }
+    if (oferta.titulo.length<=1||oferta.detalles.length<=1||oferta.precio<=0){
+        res.redirect("/oferta/agregar" +
+            "?mensaje=Titulo, detalles o precio no validos"+
+            "&tipoMensaje=alert-danger ");
+    }
+    else {
+            // Conectarse
+            gestorBD.insertarOferta(oferta, function (id) {
+                if (id == null) {
+                    res.send("Error al insertar oferta");
+                } else {
+                    res.redirect('/ofertas/propias');
+                }
 
-        });
+            });
+        }
     });
 
     app.get('/oferta/eliminar/:id', function (req, res) {
@@ -65,7 +72,7 @@ module.exports = function(app, swig, gestorBD) {
             if ( ofertas == null){
                 res.redirect("/ofertas?mensaje=Error al eliminar oferta");
             } else {
-                res.redirect("/ofertas");
+                res.redirect("/ofertas/propias");
             }
         });
     });
