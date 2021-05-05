@@ -40,10 +40,14 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.post('/oferta/agregar', function (req,res){
+
+    var fecha = new Date();
+
     let oferta = {
         titulo : req.body.titulo,
         detalles : req.body.detalles,
         precio : req.body.precio,
+        fecha : fecha.toLocaleDateString(),
         usuario: req.session.usuario
     }
 
