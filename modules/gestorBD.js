@@ -6,6 +6,61 @@ module.exports = {
         this.app = app;
     },
 
+    obtenerCompras : function(criterio,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('compras');
+                collection.find(criterio).toArray(function(err, usuarios) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(usuarios);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    insertarCompra: function(compra, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('compras');
+                collection.insert(compra, function(err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
+    obtenerOfertaPg : function(criterio,pg,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('ofertas');
+                collection.count(function(err, count){
+                    collection.find(criterio).skip( (pg-1)*5 ).limit( 5 )
+                        .toArray(function(err, ofertas) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(ofertas, count);
+                            }
+                            db.close();
+                        });
+                });
+            }
+        });
+    },
     eliminarOferta : function(criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {

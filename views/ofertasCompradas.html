@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block titulo %} Lista de Mis Compras {% endblock %}
+
+{% block contenido_principal %}
+<h2>Lista De Mis Compras</h2>
+
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Titulo</th>
+            <th>Detalles</th>
+            <th>Precio</th>
+            <th>Vendedor</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for compra in compras %}
+        <tr>
+            <td>{{ compra.titulo }}</td>
+            <td>{{ compra.detalles }}</td>
+            <td>{{ compra.precio }}€</td>
+            <td>{{ compra.vendedor }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}

@@ -45,7 +45,7 @@ app.use("/usuarios",routerUsuarioSession);
 app.use("/usuarios/eliminar",routerUsuarioSession);
 app.use("/oferta/modificar",routerUsuarioSession);
 app.use("/oferta/eliminar",routerUsuarioSession);
-app.use("/compras",routerUsuarioSession);
+app.use("/ofertas/compradas",routerUsuarioSession);
 
 //routerUsuarioAutor
 let routerUsuarioAutor = express.Router();
@@ -68,7 +68,6 @@ routerUsuarioAutor.use(function(req, res, next) {
 //Aplicar routerUsuarioAutor
 app.use("/oferta/modificar",routerUsuarioAutor);
 app.use("/oferta/eliminar",routerUsuarioAutor);
-app.use("/compras",routerUsuarioAutor);
 
 
 //routerUsuarioRol
