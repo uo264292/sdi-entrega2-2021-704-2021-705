@@ -45,7 +45,7 @@
             <td>{{ oferta.precio }}€</td>
             {% if usuario==oferta.usuario %}
             <td>Esta oferta es tuya</td>
-            {% elif sepuedecomprar %}
+            {% elif  !oferta.comprada %}
             <td>
                 <a class="btn btn-primary pull-right"
                    href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a>

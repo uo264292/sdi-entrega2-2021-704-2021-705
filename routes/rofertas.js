@@ -36,7 +36,6 @@ module.exports = function(app, swig, gestorBD) {
                     {
                         ofertas : ofertas,
                         paginas : paginas,
-                        sepuedecomprar: true,
                         usuario: req.session.usuario,
                         actual : pg
                     });
@@ -76,6 +75,7 @@ module.exports = function(app, swig, gestorBD) {
         detalles : req.body.detalles,
         precio : req.body.precio,
         fecha : fecha.toLocaleDateString(),
+        comprada : false,
         usuario: req.session.usuario
     }
 
@@ -128,13 +128,43 @@ module.exports = function(app, swig, gestorBD) {
                             precio : ofertas[0].precio,
                             vendedor : ofertas[0].usuario
                         }
-                        gestorBD.insertarCompra(compra ,function(idCompra){
-                            if ( idCompra == null ){
-                                res.send("La oferta no ha podido ser insertada.");
-                            } else {
-                                res.redirect("/ofertas/compradas");
-                            }
-                        });
+                        if (req.session.dinero<compra.precio){
+                            res.redirect("/ofertas" +
+                                "?mensaje=Dinero insuficiente"+
+                                "&tipoMensaje=alert-danger ");
+                        }else{
+                            gestorBD.insertarCompra(compra ,function(idCompra){
+                                if ( idCompra == null ){
+                                    res.send("La oferta no ha podido ser insertada.");
+                                }
+                                else {
+                                    let criterio_comprada={"_id":ofertaID};
+                                    let oferta = {
+                                        comprada : true
+                                    }
+                                    gestorBD.modificarOferta(criterio_comprada,oferta, function (result){
+                                        if (result == null) {
+                                            res.send("Error al modificar ");
+                                        } else {
+                                            let criterio_usuario = {email:usuario};
+                                            let dineroTrasCompra = req.session.dinero-compra.precio;
+                                            let usuarioModificado = {
+                                                dinero : dineroTrasCompra
+                                            }
+                                            gestorBD.modificarUsuario(criterio_usuario, usuarioModificado, function (result){
+                                                if (result == null) {
+                                                    res.send("Error al pagar ");
+                                                } else {
+                                                    res.redirect("/ofertas/compradas");
+                                                }
+                                            });
+
+                                        }
+                                    });
+
+                                }
+                            });
+                        }
                     }
                 });
 
