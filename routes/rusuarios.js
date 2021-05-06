@@ -33,18 +33,27 @@ module.exports = function(app, swig, gestorBD) {
             rol : "estandar",
             password : seguro
         }
-        gestorBD.insertarUsuario(usuario, function(id) {
-            if (id == null){
-                res.redirect("/registrarse?mensaje=Error al registrar usuario");
-            }
-            if (req.body.password!=req.body.repeatPassword){
+
+        let criterio = {email: usuario.email};
+        gestorBD.obtenerUsuarios(criterio, function (usuarioObtenido){
+           if (usuarioObtenido!=null){
+               res.redirect("/registrarse?mensaje=Ya existe un usuario con ese email.");
+           }
+           else if (req.body.password!=req.body.repeatPassword){
                 res.redirect("/registrarse?mensaje=La contraseña no coincide.");
-            }
-            else {
-                req.session.usuario = usuario.email;
-                res.redirect("/usuarios");
-            }
+           } else {
+               gestorBD.insertarUsuario(usuario, function(id) {
+                   if (id == null){
+                       res.redirect("/registrarse?mensaje=Error al registrar usuario");
+                   } else {
+                       req.session.usuario = usuario.email;
+                       res.redirect("/usuarios");
+                   }
+               });
+           }
         });
+
+
     });
 
     app.get("/identificarse", function(req, res) {

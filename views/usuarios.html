@@ -14,20 +14,23 @@
       <th class="col-md-1"></th>
     </tr>
     </thead>
-    <tbody>
-    {% for usuario in usuarios %}
-    <tr>
-      <td>{{ usuario.email }}</td>
-      <td>{{ usuario.nombre }}</td>
-      <td>{{ usuario.apellidos }}</td>
-      <td><a href="/usuario/modificar/{{ usuario._id.toString() }}">Modificar</a> <br>
-        <a href="/usuario/eliminar/{{ usuario._id.toString() }}">Eliminar</a> <br>
-      </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</div>
+    <form method="post" action="/usuario/eliminar">
+      <tbody>
+      {% for usuario in usuarios %}
+      <tr>
+        <td>{{ usuario.email }}</td>
+        <td>{{ usuario.nombre }}</td>
+        <td>{{ usuario.apellidos }}</td>
+        <td>
+        <input type="checkbox" id="{{usuario.id}}" value="cboxEliminar">
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
 
+  </table>
+  <button type="submit" class="btn btn-primary" id="btnEliminar">Eliminar</button>
+  </form>
+</div>
 
 {% endblock %}
