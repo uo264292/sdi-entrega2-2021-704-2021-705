@@ -76,6 +76,7 @@ module.exports = function(app, swig, gestorBD) {
         precio : req.body.precio,
         fecha : fecha.toLocaleDateString(),
         comprada : false,
+        destacar : false,
         usuario: req.session.usuario
     }
 
@@ -189,6 +190,40 @@ module.exports = function(app, swig, gestorBD) {
                 res.send(respuesta);
             }
         });
+    });
+
+    app.get('/oferta/destacar/:id', function (req, res) {
+        let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
+        let usuario = req.session.usuario;
+
+        let oferta = {
+            destacar: true
+        }
+
+        if (req.session.dinero>=20){
+            gestorBD.modificarOferta(criterio,oferta,function(result){
+                if ( result == null){
+                    res.redirect("/ofertas/propias?mensaje=Error al destacar oferta");
+                } else {
+                    let criterio_usuario = {email:usuario};
+                    let dineroTrasDestacar = req.session.dinero-20;
+                    let usuarioAModificar = {
+                        dinero: dineroTrasDestacar
+                    };
+                    gestorBD.modificarUsuario(criterio_usuario, usuarioAModificar, function (result){
+                        if (result == null) {
+                            res.send("Error al pagar ");
+                        } else {
+                            res.redirect("/ofertas");
+                        }
+                    });
+                }
+            });
+        }
+        else{
+            res.redirect("/ofertas/propias?mensaje=No dispone de saldo suficiente.");
+        }
+
     });
 
     function sePuedeComprar(usuario, ofertaId, funcionCallback){
