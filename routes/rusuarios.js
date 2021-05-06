@@ -81,13 +81,41 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get('/usuario/eliminar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
-        gestorBD.eliminarUsuario(criterio,function(usuarios){
-            if ( usuarios == null ){
-                res.redirect("/usuarios?mensaje=Error al eliminar usuario");
-            } else {
-                res.redirect("/usuarios");
+
+        gestorBD.obtenerUsuarios(criterio, function(usuarioAEliminar){
+            if (usuarioAEliminar==null){
+                res.send("Algo salio mal");
+            } else{
+                let criterio2= {usuario:usuarioAEliminar[0].email}
+                gestorBD.obtenerOferta(criterio2,function (ofertas){
+                    if (ofertas == null|| ofertas.length<=0){
+                        gestorBD.eliminarUsuario(criterio,function(usuarios){
+                            if ( usuarios == null ){
+                                res.redirect("/usuarios?mensaje=Error al eliminar usuario");
+                            } else {
+                                res.redirect("/usuarios");
+                            }
+                        });
+                    } else{
+                        gestorBD.eliminarOferta(criterio2, function (ofertasABorrar){
+                            if (ofertasABorrar==null){
+                                res.send("Paso algo raro");
+                            } else{
+                                gestorBD.eliminarUsuario(criterio,function(usuarios){
+                                    if ( usuarios == null ){
+                                        res.redirect("/usuarios?mensaje=Error al eliminar usuario");
+                                    } else {
+                                        res.redirect("/usuarios");
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             }
         });
+
+
     });
 
 };
