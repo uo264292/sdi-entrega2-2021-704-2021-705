@@ -31,9 +31,19 @@
         <li id="mOfertasPropias"><a href="/ofertas/propias">Ver mis Ofertas</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-	    <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
-        <li><a href="/desconectarse"><span class="glyphicon glyphicon-log-in"></span> Desconectarse</a></li>
-        <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Iniciar Sesion</a></li>
+        {% if user == null%}
+        <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
+        <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+        {% endif %}
+
+        {% if user != null && dinero !=null && admin != 'admin' %}
+        <li id="mDinero"><a>Dinero:{{dinero}} €</a></li>
+        <li id="mEmail"><a>Email:{{user}}</a></li>
+        {% endif %}
+
+        {% if user != null%}
+       <li><a href="/desconectarse"><span class="glyphicon glyphicon-log-in"></span> Desconectarse</a></li>
+        {% endif %}
       </ul>
     </div>
   </div>

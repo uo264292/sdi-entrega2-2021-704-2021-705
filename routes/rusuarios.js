@@ -58,7 +58,12 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get("/identificarse", function(req, res) {
-        let respuesta = swig.renderFile('views/bidentificacion.html', {});
+        swig.renderFile('views/base.html', {usuario: req.session.usuario});
+        let respuesta = swig.renderFile('views/bidentificacion.html', {
+            user: req.session.usuario,
+            dinero: req.session.dinero,
+            admin: req.session.admin
+        });
         res.send(respuesta);
     });
 
@@ -86,6 +91,7 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
+        req.session.dinero = null;
         res.redirect("/identificarse");
     });
 
