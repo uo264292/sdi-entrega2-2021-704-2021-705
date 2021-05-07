@@ -88,6 +88,7 @@ routerUsuarioRol.use(function(req, res, next) {
 //Aplicar routerUsuarioRol
 app.use("/usuarios",routerUsuarioRol);
 app.use("/usuarios/eliminar",routerUsuarioRol);
+app.use("/usuario/eliminar",routerUsuarioRol);
 
 
 

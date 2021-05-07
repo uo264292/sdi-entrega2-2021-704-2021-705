@@ -14,7 +14,7 @@
       <th class="col-md-1"></th>
     </tr>
     </thead>
-    <form method="post" action="/usuario/eliminar">
+    <form method="post" action="/usuarios/eliminar">
       <tbody>
       {% for usuario in usuarios %}
       <tr>
@@ -22,7 +22,7 @@
         <td>{{ usuario.nombre }}</td>
         <td>{{ usuario.apellidos }}</td>
         <td>
-        <input type="checkbox" id="{{usuario.id}}" value="cboxEliminar">
+        <input type="checkbox" name="usuarios" value="{{usuario.email}}">
         </td>
       </tr>
       {% endfor %}
