@@ -9,7 +9,9 @@ module.exports = function(app, swig, gestorBD) {
             } else {
                 let respuesta = swig.renderFile('views/usuarios.html',
                     {
-                        usuarios : usuarios
+                        usuarios : usuarios,
+                        user: req.session.usuario,
+                        dinero: req.session.dinero
                     });
                 res.send(respuesta);
             }
@@ -58,12 +60,7 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get("/identificarse", function(req, res) {
-        swig.renderFile('views/base.html', {usuario: req.session.usuario});
-        let respuesta = swig.renderFile('views/bidentificacion.html', {
-            user: req.session.usuario,
-            dinero: req.session.dinero,
-            admin: req.session.admin
-        });
+        let respuesta = swig.renderFile('views/bidentificacion.html', {});
         res.send(respuesta);
     });
 

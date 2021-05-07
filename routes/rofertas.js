@@ -37,6 +37,8 @@ module.exports = function(app, swig, gestorBD) {
                         ofertas : ofertas,
                         paginas : paginas,
                         usuario: req.session.usuario,
+                        user: req.session.usuario,
+                        dinero: req.session.dinero,
                         actual : pg
                     });
                 res.send(respuesta);
@@ -53,6 +55,8 @@ module.exports = function(app, swig, gestorBD) {
             } else {
                 let respuesta = swig.renderFile('views/ofertasPropias.html',
                     {
+                        user: req.session.usuario,
+                        dinero: req.session.dinero,
                         ofertas : ofertas
                     });
                 res.send(respuesta);
@@ -62,6 +66,8 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get('/oferta/agregar', function (req,res){
         let respuesta = swig.renderFile('views/addOferta.html',{
+            user: req.session.usuario,
+            dinero: req.session.dinero
         });
         res.send(respuesta);
     });
@@ -185,6 +191,8 @@ module.exports = function(app, swig, gestorBD) {
             } else {
                 let respuesta = swig.renderFile('views/ofertasCompradas.html',
                     {
+                        user: req.session.usuario,
+                        dinero: req.session.dinero,
                         compras : compras
                     });
                 res.send(respuesta);
