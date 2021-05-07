@@ -97,7 +97,11 @@ module.exports = function(app, swig, gestorBD) {
                 if (id == null) {
                     res.send("Error al insertar oferta");
                 } else {
-                    res.redirect('/ofertas/propias');
+                    if (typeof req.body.destacar!=='undefined'){
+                        res.redirect("/oferta/destacar/" + id.toString());
+                    } else{
+                        res.redirect('/ofertas/propias');
+                    }
                 }
 
             });
@@ -162,6 +166,7 @@ module.exports = function(app, swig, gestorBD) {
                                                 if (result == null) {
                                                     res.send("Error al pagar ");
                                                 } else {
+                                                    req.session.dinero=dineroTrasCompra;
                                                     res.redirect("/ofertas/compradas");
                                                 }
                                             });
@@ -222,6 +227,7 @@ module.exports = function(app, swig, gestorBD) {
                         if (result == null) {
                             res.send("Error al pagar ");
                         } else {
+                            req.session.dinero=dineroTrasDestacar;
                             res.redirect("/ofertas");
                         }
                     });
