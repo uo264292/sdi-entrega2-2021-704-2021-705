@@ -17,6 +17,7 @@
     <form method="post" action="/usuarios/eliminar">
       <tbody>
       {% for usuario in usuarios %}
+      {% if usuario.rol != 'admin' %}
       <tr>
         <td>{{ usuario.email }}</td>
         <td>{{ usuario.nombre }}</td>
@@ -25,6 +26,7 @@
         <input type="checkbox" name="usuarios" value="{{usuario.email}}">
         </td>
       </tr>
+      {% endif %}
       {% endfor %}
       </tbody>
 
