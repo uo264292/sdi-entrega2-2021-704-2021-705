@@ -26,7 +26,6 @@ public class PO_ListUsersView extends PO_NavView{
 	}
 	
 	static public void deleteUserByName(WebDriver driver, String user) {		
-		driver.navigate().to("https://localhost:8081/usuarios");
 		clickOptionId(driver, user, "id");
 		By boton = By.className("btn");
 		driver.findElement(boton).click();

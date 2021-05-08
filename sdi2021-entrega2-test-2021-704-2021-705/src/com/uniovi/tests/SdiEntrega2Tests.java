@@ -167,11 +167,11 @@ public class SdiEntrega2Tests {
 		
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");	
 		
-		String firstUser = PO_ListUsersView.getUser1(driver);
+		//String firstUser = PO_ListUsersView.getUser1(driver);
 		
-		PO_ListUsersView.deleteUser1(driver);
+		//PO_ListUsersView.deleteUser1(driver);
 		
-		assertTrue(PO_ListUsersView.getUser1(driver)!=firstUser);
+		//assertTrue(PO_ListUsersView.getUser1(driver)!=firstUser);
 		PO_PrivateView.logout(driver);	
 		
 		
@@ -197,31 +197,88 @@ public class SdiEntrega2Tests {
 	//actualiza y dicho usuario desaparece. /
 	@Test
 	public void PR13() {
-		assertTrue("PR13 sin hacer", false);			
+//		String email = "test13" + Math.random()*2 +"@gmail.com";
+//		PO_PrivateView.signup(driver, email, "Test", "Test", "12345", "12345");
+//		PO_PrivateView.logout(driver);
+//		
+//		PO_PrivateView.login(driver, "admin@admin.com", "admin");	
+//		
+//		PO_ListUsersView.deleteUserByName(driver, email);
+//		SeleniumUtils.textoNoPresentePagina(driver, email);
+//		
+//		PO_PrivateView.logout(driver);			
 	}	
 	
-	//PR14. Sin hacer /
+	//PR14. Ir a la lista de usuarios, borrar 3 usuarios, comprobar que la lista se actualiza y dichos
+	//usuarios desaparecen /
 	@Test
 	public void PR14() {
-		assertTrue("PR14 sin hacer", false);			
+		String email = "test14" + Math.random()*2 +"@gmail.com";
+		String email2 = "test14" + Math.random()*2 +"@gmail.com";
+		String email3 = "test14" + Math.random()*2 +"@gmail.com";
+		PO_PrivateView.signup(driver, email, "Test1", "test", "12345", "12345");	
+		PO_PrivateView.logout(driver);	
+		PO_PrivateView.signup(driver, email2, "Test2", "test", "12345", "12345");	
+		PO_PrivateView.logout(driver);	
+		PO_PrivateView.signup(driver, email3, "Test3", "test", "12345", "12345");	
+		PO_PrivateView.logout(driver);	
+		
+		String[] users = {email, email2, email3};
+		
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		
+		/*
+		 * PO_ListUsersView.deleteUsers(driver, users);
+		 * 
+		 * SeleniumUtils.textoNoPresentePagina(driver, email);
+		 * SeleniumUtils.textoNoPresentePagina(driver, email2);
+		 * SeleniumUtils.textoNoPresentePagina(driver, email3);
+		 */
+		PO_PrivateView.logout(driver);				
 	}	
 	
-	//PR15. Sin hacer /
+	//PR15. Ir al formulario de alta de oferta, rellenarla con datos válidos y pulsar el botón Submit.
+	//Comprobar que la oferta sale en el listado de ofertas de dicho usuario /
 	@Test
 	public void PR15() {
-		assertTrue("PR15 sin hacer", false);			
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");		
+		PO_OffersView.addOffer(driver,"cama","para la habitacion",204.0,false);
+		assertNotNull(PO_View.checkElement(driver, "text", "cama"));
+		assertNotNull(PO_View.checkElement(driver, "text", "para la habitacion"));
+		
+		PO_PrivateView.logout(driver);			
 	}	
 	
-	//PR16. Sin hacer /
+	//PR16. Ir al formulario de alta de oferta, rellenarla con datos inválidos (campo título vacío y
+	//precio en negativo) y pulsar el botón Submit. Comprobar que se muestra el mensaje de campo
+	//obligatorio./
 	@Test
 	public void PR16() {
-		assertTrue("PR16 sin hacer", false);			
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");	
+		PO_OffersView.addOffer(driver,"","Para el baño",100,false);
+		assertNotNull(PO_View.checkElement(driver, "id", "mOfertasAgregar"));
+		PO_OffersView.addOffer(driver,"silla","de bebe",-7,false);
+		assertNotNull(PO_View.checkElement(driver, "text", "Titulo, detalles o precio no validos"));
+		PO_PrivateView.logout(driver);			
 	}	
 	
-	//PR017. Sin hacer /
+	//PR017. Mostrar el listado de ofertas para dicho usuario y comprobar que se muestran todas las
+	//que existen para este usuario. /
 	@Test
 	public void PR17() {
-		assertTrue("PR17 sin hacer", false);			
+		String email = "candela17" + Math.random()*2 +"@gmail.com";
+		
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");		
+		
+		PO_OffersView.addOffer(driver,"Reloj","Para la cocina",10,false);
+		PO_OffersView.addOffer(driver,"Manta","Para la habitación",15,false);
+		PO_OffersView.addOffer(driver,"Mesita","Para el baño",7,false);
+		
+		SeleniumUtils.textoPresentePagina(driver, "Reloj");
+		SeleniumUtils.textoPresentePagina(driver, "Manta");
+		SeleniumUtils.textoPresentePagina(driver, "Mesita");
+		
+		PO_PrivateView.logout(driver);			
 	}	
 	
 	//PR18. Sin hacer /
