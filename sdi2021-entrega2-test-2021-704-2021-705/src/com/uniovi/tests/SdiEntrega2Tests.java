@@ -7,6 +7,8 @@ import java.util.Random;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 //Paquetes Selenium 
@@ -24,11 +26,6 @@ public class SdiEntrega2Tests {
 	//En Windows (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
 	static String Geckdriver024 = "C:\\geckodriver024win64.exe";
-	//En MACOSX (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens automÃ¡ticas):
-	//static String PathFirefox65 = "/Applications/Firefox 2.app/Contents/MacOS/firefox-bin";
-	//static String PathFirefox64 = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
-	//static String Geckdriver024 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver024mac";
-	//static String Geckdriver022 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver023mac";
 	//ComÃºn a Windows y a MACOSX
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024); 
 	static String URL = "https://localhost:8081";
@@ -109,45 +106,95 @@ public class SdiEntrega2Tests {
 	//PR06. Inicio de sesión con datos inválidos (email existente, pero contraseña incorrecta). /
 	@Test
 	public void PR06() {
-		assertTrue("PR06 sin hacer", false);			
+		PO_PrivateView.login(driver, "candela@gmail.com", "falsa");		
+		assertNotNull(PO_View.checkElement(driver, "text", "Email o password incorrecto"));			
 	}
 	
-	//PR07. SInicio de sesión con datos inválidos (campo email o contraseña vacíos). /
+	//PR07. Inicio de sesión con datos inválidos (campo email o contraseña vacíos). /
 	@Test
 	public void PR07() {
-		assertTrue("PR07 sin hacer", false);			
+		//Sin contraseña
+		PO_PrivateView.login(driver, "candela@gmail.com", "");		
+		assertNotNull(PO_View.checkElement(driver, "id", "IdentificacionTitle"));
+		SeleniumUtils.textoNoPresentePagina(driver,"Email: ");
+		//Sin email
+		PO_PrivateView.login(driver, "", "12345");	
+		assertNotNull(PO_View.checkElement(driver, "id", "IdentificacionTitle"));
+		SeleniumUtils.textoNoPresentePagina(driver,"Email: ");		
 	}	
 	
 	//PR08. Inicio de sesión con datos inválidos (email no existente en la aplicación) /
 	@Test
 	public void PR08() {
-		assertTrue("PR08 sin hacer", false);			
+		PO_PrivateView.login(driver, "alguien@gmail.com", "falsa");		
+		assertNotNull(PO_View.checkElement(driver, "text", "Email o password incorrecto"));	
+		assertNotNull(PO_View.checkElement(driver, "id", "IdentificacionTitle"));
+		SeleniumUtils.textoNoPresentePagina(driver,"Email: ");		
 	}	
 	
-	//PR09. Sin hacer /
+	//PR09. Hacer click en la opción de salir de sesión y comprobar que se redirige a la página de inicio de sesión (Login) /
 	@Test
 	public void PR09() {
-		assertTrue("PR09 sin hacer", false);			
+		PO_PrivateView.login(driver, "candela@gmail.com", "12345");	
+		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas Destacadas"));
+		PO_PrivateView.logout(driver);	
+		PO_View.checkElement(driver, "id", "IdentificacionTitle");
+		SeleniumUtils.textoNoPresentePagina(driver, "Dinero:");				
 	}	
-	//PR10. Sin hacer /
+	//PR10. Comprobar que el botón cerrar sesión no está visible si el usuario no está autenticado /
 	@Test
 	public void PR10() {
-		assertTrue("PR10 sin hacer", false);			
+		SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");				
 	}	
 	
-	//PR11. Sin hacer /
+	//PR11. Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema.  /
 	@Test
 	public void PR11() {
-		assertTrue("PR11 sin hacer", false);			
+		
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");	
+		driver.navigate().to("https://localhost:8081/usuarios");
+		
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com"));
+		assertNotNull(PO_View.checkElement(driver, "text", "sergio@gmail.com"));
+		assertNotNull(PO_View.checkElement(driver, "text", "admin@admin.com"));
+				
 	}	
 	
-	//PR12. Sin hacer /
+	//PR12. Ir a la lista de usuarios, borrar el primer usuario de la lista, comprobar que la lista se
+	//actualiza y dicho usuario desaparece. /
 	@Test
 	public void PR12() {
-		assertTrue("PR12 sin hacer", false);			
+		
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");	
+		
+		String firstUser = PO_ListUsersView.getUser1(driver);
+		
+		PO_ListUsersView.deleteUser1(driver);
+		
+		assertTrue(PO_ListUsersView.getUser1(driver)!=firstUser);
+		PO_PrivateView.logout(driver);	
+		
+		
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if(SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if(SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if(SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		
+		
 	}	
 	
-	//PR13. Sin hacer /
+	//PR13. Ir a la lista de usuarios, borrar el último usuario de la lista, comprobar que la lista se
+	//actualiza y dicho usuario desaparece. /
 	@Test
 	public void PR13() {
 		assertTrue("PR13 sin hacer", false);			
