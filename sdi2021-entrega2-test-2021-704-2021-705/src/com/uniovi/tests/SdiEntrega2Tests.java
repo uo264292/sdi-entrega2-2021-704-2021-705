@@ -1,9 +1,13 @@
 package com.uniovi.tests;
 //Paquetes Java
 import java.util.List;
+import java.util.Random;
+
 //Paquetes JUnit 
 import org.junit.*;
 import org.junit.runners.MethodSorters;
+
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 //Paquetes Selenium 
 import org.openqa.selenium.*;
@@ -19,7 +23,7 @@ import com.uniovi.tests.pageobjects.*;
 public class SdiEntrega2Tests {
 	//En Windows (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "C:\\Path\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\geckodriver024win64.exe";
 	//En MACOSX (Debe ser la versiÃ³n 65.0.1 y desactivar las actualizacioens automÃ¡ticas):
 	//static String PathFirefox65 = "/Applications/Firefox 2.app/Contents/MacOS/firefox-bin";
 	//static String PathFirefox64 = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -28,7 +32,7 @@ public class SdiEntrega2Tests {
 	//ComÃºn a Windows y a MACOSX
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024); 
 	static String URL = "https://localhost:8081";
-
+	
 
 	public static WebDriver getDriver(String PathFirefox, String Geckdriver) {
 		System.setProperty("webdriver.firefox.bin", PathFirefox);
@@ -59,49 +63,62 @@ public class SdiEntrega2Tests {
 		driver.quit();
 	}
 
-	//PR01. Sin hacer /
+	//PR01. Registro de usuario con datos validos/
 	@Test
 	public void PR01() {
-		assertTrue("PR01 sin hacer", false);			
+		String email = "candela" + Math.random()*6 +"@gmail.com";
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas Destacadas"));	
+		PO_PrivateView.logout(driver);	
+		PO_View.checkElement(driver, "text", "Identificación de usuario");
+			
 	}
 
-	//PR02. Sin hacer /
+	//PR02. Registro de Usuario con datos inválidos (email, nombre y apellidos vacíos)./
 	@Test
 	public void PR02() {
-		assertTrue("PR02 sin hacer", false);			
+		PO_PrivateView.signup(driver, "", "", "", "12345", "12345");
+		assertNotNull(PO_View.checkElement(driver, "id", "signup"));					
 	}
 
-	//PR03. Sin hacer /
+	//PR03. Registro de Usuario con datos inválidos (repetición de contraseña inválida) /
 	@Test
 	public void PR03() {
-		assertTrue("PR03 sin hacer", false);			
+		PO_PrivateView.signup(driver, "candelabj00@gmail.com", "Candela", "Bobes", "12345", "12345865736");
+		assertNotNull(PO_View.checkElement(driver, "id", "signup"));		
+		assertNotNull(PO_View.checkElement(driver, "text", "La contraseña no coincide"));
 	}
 	
-	//PR04. Sin hacer /
+	//PR04. Registro de Usuario con datos inválidos (email existente). /
 	@Test
 	public void PR04() {
-		assertTrue("PR04 sin hacer", false);			
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		assertNotNull(PO_View.checkElement(driver, "id", "signup"));		
+		assertNotNull(PO_View.checkElement(driver, "text", "Ya existe un usuario con ese email."));			
 	}
 	
-	//PR05. Sin hacer /
+	//PR05. Inicio de sesión con datos válidos. /
 	@Test
 	public void PR05() {
-		assertTrue("PR05 sin hacer", false);			
+		PO_PrivateView.login(driver, "candela@gmail.com", "12345");		
+		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas Destacadas"));	
+		PO_PrivateView.logout(driver);	
+		PO_View.checkElement(driver, "text", "Identificación de usuario");
 	}
 	
-	//PR06. Sin hacer /
+	//PR06. Inicio de sesión con datos inválidos (email existente, pero contraseña incorrecta). /
 	@Test
 	public void PR06() {
 		assertTrue("PR06 sin hacer", false);			
 	}
 	
-	//PR07. Sin hacer /
+	//PR07. SInicio de sesión con datos inválidos (campo email o contraseña vacíos). /
 	@Test
 	public void PR07() {
 		assertTrue("PR07 sin hacer", false);			
 	}	
 	
-	//PR08. Sin hacer /
+	//PR08. Inicio de sesión con datos inválidos (email no existente en la aplicación) /
 	@Test
 	public void PR08() {
 		assertTrue("PR08 sin hacer", false);			

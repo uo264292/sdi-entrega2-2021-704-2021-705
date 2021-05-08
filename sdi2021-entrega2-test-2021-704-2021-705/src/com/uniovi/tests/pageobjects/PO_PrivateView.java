@@ -24,5 +24,22 @@ public class PO_PrivateView extends PO_NavView{
 		By boton = By.className("btn");
 		driver.findElement(boton).click();	
 	}
-	
+
+	static public void signup(WebDriver driver, String emailp, String namep, String surnamep, String passwordp, String passwordRp) {
+		clickOptionId(driver, "signup", "id");
+		PO_RegisterView.fillForm(driver, emailp, namep, surnamep, passwordp, passwordRp);
+	}
+	static public void login(WebDriver driver, String emailp, String password) {
+		clickOptionId(driver, "login", "id");
+		PO_LoginView.fillForm(driver, emailp , password);
+	}
+	static public void logout(WebDriver driver) {
+		clickOptionId(driver, "logout", "id");
+	}
+	static public String getMoney(WebDriver driver) {
+		WebElement money = driver.findElement(By.id("mDinero"));		
+		return money.toString().split(":")[1];
+	}
+
+
 }
