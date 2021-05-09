@@ -36,8 +36,8 @@
         <li id="login"><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
         {% endif %}
 
-        {% if user != null && dinero !=null %}
-        <li id="mDinero"><a>Dinero: {{dinero}} €</a></li>
+        {% if user != null %}
+        <li id="dineroLi"><a class="nav-link disabled">Dinero:{{dinero}}</a></li>
         <li id="mEmail"><a>Email: {{user}}</a></li>
         {% endif %}
 

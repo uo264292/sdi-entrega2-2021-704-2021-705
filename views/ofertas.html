@@ -8,10 +8,10 @@
         <form method="get" action="/ofertas" >
             <div
                     class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-right">
-                <input type="text" class="search-query form-control"
+                <input type="text" class="search-query form-control" id="busqueda"
                        placeholder="Titulo de la oferta" name="busqueda"/>
                 <span class="input-group-btn">
-                    <button class="btn" type="submit">
+                    <button class="btn" type="submit" id="botonBusqueda">
                         <span class="glyphicon glyphicon-search"></span>
                     </button>
                 </span>
@@ -84,7 +84,7 @@
             <td>Esta oferta es tuya</td>
             {% elif  !oferta.comprada %}
             <td>
-                <a class="btn btn-primary pull-right"
+                <a id="bcomprar" class="btn btn-primary pull-right"
                    href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a>
             </td>
             {% else %}
