@@ -15,8 +15,10 @@ module.exports = function(app, gestorBD) {
                     mensaje: 'Usuario no registrado.'
                 });
             } else {
+                req.session.usuario = criterio.email;
                 let token = app.get('jwt').sign({usuario: criterio.email, tiempo: Date.now() / 1000}, "secreto");
                 res.status(200);
+
                 res.json({
                     autenticado: true,
                     token: token
@@ -33,17 +35,13 @@ module.exports = function(app, gestorBD) {
             if (ofertas == null) {
                 res.status(500);
                 res.json({
-                    error : "se ha producido un error"
+                    error: "Se ha producido un error al cargar las ofertas"
                 })
             } else {
-                for (let i=0; i<ofertas.length;i++){
-                    if (ofertas[i].usuario==res.usuario){
-                        let pos = ofertas.indexOf("ofertas[i]");
-                        ofertas.splice(pos,1);
-                    }
-                }
+                let user = req.session.usuario;
+                let listaSinUser = ofertas.filter((oferta) => oferta.usuario !== user);
                 res.status(200);
-                res.send( JSON.stringify(ofertas));
+                res.send(JSON.stringify(listaSinUser));
             }
         });
     });

@@ -62,6 +62,11 @@ routerUsuarioToken.use(function(req, res, next) {
 });
 // Aplicar routerUsuarioToken
 app.use('/api/ofertas/ajenas', routerUsuarioToken);
+app.use('/api/conversaciones', routerUsuarioToken);
+app.use('/api/conversacion', routerUsuarioToken);
+app.use('/api/mensaje', routerUsuarioToken);
+app.use('/api/mensajes', routerUsuarioToken);
+
 
 
 
@@ -133,9 +138,9 @@ app.use("/usuario/eliminar",routerUsuarioRol);
 
 //Rutas/controladores por lógica
 require("./routes/rusuarios.js")(app, swig,gestorBD);
-require("./routes/rofertas")(app,swig,gestorBD);
-require("./routes/rapiwallapop")(app,gestorBD);
-
+require("./routes/rofertas.js")(app,swig,gestorBD);
+require("./routes/rapiwallapop.js")(app,gestorBD);
+require("./routes/rapiconversaciones.js")(app,gestorBD);
 app.get('/', function (req, res) {
     res.redirect('/identificarse');
 })
