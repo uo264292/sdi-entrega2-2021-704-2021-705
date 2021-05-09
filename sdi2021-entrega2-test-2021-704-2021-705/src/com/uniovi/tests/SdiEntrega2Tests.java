@@ -44,17 +44,9 @@ public class SdiEntrega2Tests {
 
 	@Before
 	public void setUp() {
-
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:<password>@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("test");
-
-		database.getCollection("ofertas").drop();
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		PO_PrivateView.logout(driver);
-		PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-		PO_PrivateView.logout(driver);
 		driver.navigate().to(URL);
+		
+		
 	}
 
 	@After
@@ -67,21 +59,50 @@ public class SdiEntrega2Tests {
 		// COnfiguramos las pruebas.
 		// Fijamos el timeout en cada opciÃ³n de carga de una vista. 2 segundos.
 		PO_View.setTimeout(3);
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
+
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol","estandar"));
 
 	}
 
 	@AfterClass
 	static public void end() {
 		// Cerramos el navegador al finalizar las pruebas
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("test");
+
+		
 		driver.quit();
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol","admin"));
 	}
 
 	// PR01. Registro de usuario con datos validos/
 	@Test
 	public void PR01() {
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		
 		String email = "candela" + Math.random() * 6 + "@gmail.com";
 		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
-		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas Destacadas"));
+		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas"));
 		PO_PrivateView.logout(driver);
 		PO_View.checkElement(driver, "text", "Identificación de usuario");
 
@@ -116,7 +137,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void PR05() {
 		PO_PrivateView.login(driver, "candela@gmail.com", "12345");
-		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas Destacadas"));
+		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas"));
 		PO_PrivateView.logout(driver);
 		PO_View.checkElement(driver, "text", "Identificación de usuario");
 	}
@@ -158,7 +179,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void PR09() {
 		PO_PrivateView.login(driver, "candela@gmail.com", "12345");
-		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas Destacadas"));
+		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas"));
 		PO_PrivateView.logout(driver);
 		PO_View.checkElement(driver, "id", "IdentificacionTitle");
 		SeleniumUtils.textoNoPresentePagina(driver, "Dinero:");
@@ -178,7 +199,6 @@ public class SdiEntrega2Tests {
 
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		driver.navigate().to("https://localhost:8081/usuarios");
-
 		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com"));
 		assertNotNull(PO_View.checkElement(driver, "text", "sergio@gmail.com"));
 		assertNotNull(PO_View.checkElement(driver, "text", "admin@admin.com"));
@@ -427,7 +447,6 @@ public class SdiEntrega2Tests {
 		PO_PrivateView.signup(driver, email2, "Candela", "Bobes", "12345", "12345");
 
 		PO_OffersView.buyOfferByName(driver, compra);
-
 		assertEquals(80, Integer.parseInt(PO_PrivateView.dinero(driver)));
 
 		PO_PrivateView.logout(driver);

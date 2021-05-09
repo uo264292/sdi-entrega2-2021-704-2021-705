@@ -60,7 +60,7 @@ public class PO_OffersView extends PO_NavView{
 	
 	static public void buyOfferByName(WebDriver driver, String offer) {		
 		searchOfferByName(driver,offer);
-		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div[3]/table/tbody[1]/tr/td[4]/a[1]"));
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div[2]/table/tbody/tr/td[4]/a[1]"));
 		elementos.get(0).click();
 	
 		
