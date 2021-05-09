@@ -20,44 +20,6 @@
     </div>
 </div>
 
-<h2>Lista De Ofertas Destacadas</h2>
-
-
-<div class="table-responsive">
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Titulo</th>
-            <th>Detalles</th>
-            <th>Precio</th>
-            <th class="col-md-1"></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for oferta in ofertas %}
-        {% if oferta.destacar %}
-        <tr>
-            <td>{{ oferta.titulo }}</td>
-            <td>{{ oferta.detalles }}</td>
-            <td>{{ oferta.precio }}€</td>
-            {% if usuario==oferta.usuario %}
-            <td>Esta oferta es tuya</td>
-            {% elif  !oferta.comprada %}
-            <td>
-                <a class="btn btn-primary pull-right"
-                   href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a>
-            </td>
-            {% else %}
-            <td>Vendido</td>
-            {% endif %}
-        </tr>
-        {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-
 
 
 <h2>Lista De Ofertas</h2>

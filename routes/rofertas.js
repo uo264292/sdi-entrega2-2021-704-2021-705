@@ -45,6 +45,23 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
     });
+    app.get("/ofertas/destacadas", function (req, res) {
+        let criterio = {"destacada": "true"};
+
+        gestorBD.obtenerOferta(criterio, function (ofertas) {
+            if (ofertas == null) {
+                res.send("Error al listar ofertas");
+            } else {
+                let respuesta = swig.renderFile('views/ofertasDestacadas.html',
+                    {
+                        user: req.session.usuario,
+                        dinero: req.session.dinero,
+                        ofertas : ofertas
+                    });
+                res.send(respuesta);
+            }
+        });
+    })
 
     app.get("/ofertas/propias",function(req,res) {
 
@@ -204,6 +221,8 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
     });
+
+
 
     app.get('/oferta/destacar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
