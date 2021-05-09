@@ -17,6 +17,10 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.*;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.*;
 
@@ -40,6 +44,16 @@ public class SdiEntrega2Tests {
 
 	@Before
 	public void setUp() {
+
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:<password>@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("test");
+
+		database.getCollection("ofertas").drop();
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		PO_PrivateView.logout(driver);
+		PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+		PO_PrivateView.logout(driver);
 		driver.navigate().to(URL);
 	}
 
@@ -392,109 +406,158 @@ public class SdiEntrega2Tests {
 
 		PO_OffersView.searchOfferByName(driver, "ros");
 		assertNotNull(PO_View.checkElement(driver, "text", "rosa"));
-		
+
 		PO_PrivateView.logout(driver);
 	}
 
-	// PR23. Sobre una búsqueda determinada (a elección de desarrollador), comprar una oferta que
-	//deja un saldo positivo en el contador del comprobador. Y comprobar que el contador se
-	//actualiza correctamente en la vista del comprador. /
+	// PR23. Sobre una búsqueda determinada (a elección de desarrollador), comprar
+	// una oferta que
+	// deja un saldo positivo en el contador del comprobador. Y comprobar que el
+	// contador se
+	// actualiza correctamente en la vista del comprador. /
 	@Test
 	public void PR23() {
 		String email = "candela23" + Math.random() * 2 + "@gmail.com";
-		String compra = "micro" + Math.random()*2;
-		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");		
-		PO_OffersView.addOffer(driver,compra,"Microondas",20.0,false);		
+		String compra = "micro" + Math.random() * 2;
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		PO_OffersView.addOffer(driver, compra, "Microondas", 20.0, false);
 		PO_PrivateView.logout(driver);
 		String email2 = "candela23" + Math.random() * 2 + "@gmail.com";
 
-		PO_PrivateView.signup(driver, email2, "Candela", "Bobes", "12345", "12345");	
-		
+		PO_PrivateView.signup(driver, email2, "Candela", "Bobes", "12345", "12345");
+
 		PO_OffersView.buyOfferByName(driver, compra);
-		
+
 		assertEquals(80, Integer.parseInt(PO_PrivateView.dinero(driver)));
-		
+
 		PO_PrivateView.logout(driver);
 	}
 
-	// PR24. Sobre una búsqueda determinada (a elección de desarrollador), comprar una oferta que
-	//deja un saldo 0 en el contador del comprobador. Y comprobar que el contador se actualiza
-	//correctamente en la vista del comprador. 
- 
+	// PR24. Sobre una búsqueda determinada (a elección de desarrollador), comprar
+	// una oferta que
+	// deja un saldo 0 en el contador del comprobador. Y comprobar que el contador
+	// se actualiza
+	// correctamente en la vista del comprador.
+
 	@Test
 	public void PR24() {
 		String email = "candela24" + Math.random() * 2 + "@gmail.com";
-		String compra = "camara" + Math.random()*2;
-		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");		
-		PO_OffersView.addOffer(driver,compra,"camara",100.0,false);		
+		String compra = "camara" + Math.random() * 2;
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		PO_OffersView.addOffer(driver, compra, "camara", 100.0, false);
 		PO_PrivateView.logout(driver);
 		String email2 = "candela24" + Math.random() * 2 + "@gmail.com";
 
-		PO_PrivateView.signup(driver, email2, "Candela", "Bobes", "12345", "12345");	
-		
+		PO_PrivateView.signup(driver, email2, "Candela", "Bobes", "12345", "12345");
+
 		PO_OffersView.buyOfferByName(driver, compra);
-		
+
 		assertEquals(0, Integer.parseInt(PO_PrivateView.dinero(driver)));
-		
+
 		PO_PrivateView.logout(driver);
 	}
 
-	// PR25. Sobre una búsqueda determinada (a elección de desarrollador), intentar comprar una
-	//oferta que esté por encima de saldo disponible del comprador. Y comprobar que se muestra el
-	//mensaje de saldo no suficiente. /
+	// PR25. Sobre una búsqueda determinada (a elección de desarrollador), intentar
+	// comprar una
+	// oferta que esté por encima de saldo disponible del comprador. Y comprobar que
+	// se muestra el
+	// mensaje de saldo no suficiente. /
 	@Test
 	public void PR25() {
 		String email = "candela25" + Math.random() * 2 + "@gmail.com";
-		String compra = "micro" + Math.random()*2;
-		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");		
-		PO_OffersView.addOffer(driver,compra,"Microondas",110.0,false);		
+		String compra = "micro" + Math.random() * 2;
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		PO_OffersView.addOffer(driver, compra, "Microondas", 110.0, false);
 		PO_PrivateView.logout(driver);
 		String email2 = "candela24" + Math.random() * 2 + "@gmail.com";
 
-		PO_PrivateView.signup(driver, email2, "Candela", "Bobes", "12345", "12345");	
-		
+		PO_PrivateView.signup(driver, email2, "Candela", "Bobes", "12345", "12345");
+
 		PO_OffersView.buyOfferByName(driver, compra);
-		
+
 		assertEquals(100, Integer.parseInt(PO_PrivateView.dinero(driver)));
 		assertNotNull(PO_View.checkElement(driver, "text", "Dinero insuficiente"));
 		PO_PrivateView.logout(driver);
 	}
 
-	// PR26. Ir a la opción de ofertas compradas del usuario y mostrar la lista. Comprobar que
-	//aparecen las ofertas que deben aparecer. /
+	// PR26. Ir a la opción de ofertas compradas del usuario y mostrar la lista.
+	// Comprobar que
+	// aparecen las ofertas que deben aparecer. /
 	@Test
 	public void PR26() {
 		String email = "candela26" + Math.random() * 2 + "@gmail.com";
-		String compra = "micro" + Math.random()*2;
-		String compra2 = "micro" + Math.random()*2;
-		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");		
-		PO_OffersView.addOffer(driver,compra,"Microondas",110.0,false);		
-		PO_OffersView.addOffer(driver,compra2,"Microondas",110.0,false);	
+		String compra = "micro" + Math.random() * 2;
+		String compra2 = "micro" + Math.random() * 2;
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		PO_OffersView.addOffer(driver, compra, "Microondas", 110.0, false);
+		PO_OffersView.addOffer(driver, compra2, "Microondas", 110.0, false);
 		assertNotNull(PO_View.checkElement(driver, "text", compra));
 		assertNotNull(PO_View.checkElement(driver, "text", compra2));
 	}
 
-	// PR27. Al crear una oferta marcar dicha oferta como destacada y a continuación comprobar: i)
-	//que aparece en el listado de ofertas destacadas para los usuarios y que el saldo del usuario se
-	//actualiza adecuadamente en la vista del ofertante (-20).
+	// PR27. Al crear una oferta marcar dicha oferta como destacada y a continuación
+	// comprobar: i)
+	// que aparece en el listado de ofertas destacadas para los usuarios y que el
+	// saldo del usuario se
+	// actualiza adecuadamente en la vista del ofertante (-20).
 	@Test
 	public void PR27() {
 		String email = "candela27" + Math.random() * 2 + "@gmail.com";
-		String compra = "micro" + Math.random()*2;
-		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");		
-		PO_OffersView.addOffer(driver,compra,"Microondas",15.0,true);	
-		
+		String compra = "micro" + Math.random() * 2;
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		PO_OffersView.addOffer(driver, compra, "Microondas", 15.0, true);
+		driver.navigate().to("https://localhost:8081/ofertas/destacadas");
+		assertNotNull(PO_View.checkElement(driver, "text", compra));
+		assertEquals(80, Integer.parseInt(PO_PrivateView.dinero(driver)));
 	}
-	// PR028. Sin hacer /
-		@Test
-		public void PR28() {
-			assertTrue("PR28 sin hacer", false);
-		}
 
-	// PR029. Sin hacer /
+	// PR028. Sobre el listado de ofertas de un usuario con más de 20 euros de
+	// saldo, pinchar en el
+	// enlace Destacada y a continuación comprobar: i) que aparece en el listado de
+	// ofertas destacadas
+	// para los usuarios y que el saldo del usuario se actualiza adecuadamente en la
+	// vista del ofertante (-
+	// 20). /
+	@Test
+	public void PR28() {
+		String email = "candela28" + Math.random() * 2 + "@gmail.com";
+		String compra = "reloj" + Math.random() * 2;
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		PO_OffersView.addOffer(driver, compra, "de madera", 14.0, false);
+		driver.navigate().to("https://localhost:8081/ofertas/propias");
+		PO_OffersView.destacar(driver);
+
+		driver.navigate().to("https://localhost:8081/ofertas/destacadas");
+
+		assertNotNull(PO_View.checkElement(driver, "text", compra));
+		assertEquals(80, Integer.parseInt(PO_PrivateView.dinero(driver)));
+
+		PO_PrivateView.logout(driver);
+	}
+
+	// PR029. Sobre el listado de ofertas de un usuario con menos de 20 euros de
+	// saldo, pinchar en el
+	// enlace Destacada y a continuación comprobar que se muestra el mensaje de
+	// saldo no suficiente. /
 	@Test
 	public void PR29() {
-		assertTrue("PR29 sin hacer", false);
+		String email = "candela29" + Math.random() * 2 + "@gmail.com";
+		String email2 = "sergio29" + Math.random() * 2 + "@gmail.com";
+		String compra = "reloj" + Math.random() * 2;
+		String compra2 = "casco" + Math.random() * 2;
+		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
+		PO_OffersView.addOffer(driver, compra, "de madera", 85.0, false);
+		PO_PrivateView.logout(driver);
+		PO_PrivateView.signup(driver, email2, "Sergio", "Cimadevilla", "12345", "12345");
+		PO_OffersView.buyOfferByName2(driver, compra);
+		PO_OffersView.addOffer(driver, compra2, "de madera", 20.0, false);
+		driver.navigate().to("https://localhost:8081/ofertas/propias");
+		PO_OffersView.destacar2(driver);
+
+		assertNotNull(PO_View.checkElement(driver, "text", "No dispone de saldo suficiente."));
+		assertEquals(15, Integer.parseInt(PO_PrivateView.dinero(driver)));
+
+		PO_PrivateView.logout(driver);
 	}
 
 	// PR030. Sin hacer /

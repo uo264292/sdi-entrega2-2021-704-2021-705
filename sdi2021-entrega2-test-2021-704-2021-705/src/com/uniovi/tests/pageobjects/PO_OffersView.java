@@ -6,6 +6,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.uniovi.tests.util.SeleniumUtils;
+
 
 
 public class PO_OffersView extends PO_NavView{
@@ -26,7 +28,7 @@ public class PO_OffersView extends PO_NavView{
 		precio.clear();
 		precio.sendKeys(String.valueOf(preciop));
 		if(destacadap) {
-			WebElement destacada = driver.findElement(By.name("destacada"));
+			WebElement destacada = driver.findElement(By.name("destacar"));
 			destacada.click();
 		}
 			
@@ -58,8 +60,15 @@ public class PO_OffersView extends PO_NavView{
 	
 	static public void buyOfferByName(WebDriver driver, String offer) {		
 		searchOfferByName(driver,offer);
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div[3]/table/tbody[1]/tr/td[4]/a[1]"));
+		elementos.get(0).click();
+	
 		
-		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div[3]/table/tbody/tr/td[4]/a[1]"));
+	}
+	
+	static public void buyOfferByName2(WebDriver driver, String offer) {		
+		searchOfferByName(driver,offer);
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div[2]/table/tbody[1]/tr/td[4]/a[1]"));
 		elementos.get(0).click();
 	
 		
@@ -73,6 +82,19 @@ public class PO_OffersView extends PO_NavView{
 		barraBusqueda.sendKeys(offer);
 		WebElement botonBusqueda = driver.findElement(By.id("botonBusqueda"));
 		botonBusqueda.click();
+	}
+	
+	static public void destacar(WebDriver driver) {		
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div/table/tbody[1]/tr/td[4]/a"));
+		elementos.get(0).click();
+		By boton = By.className("btn");
+		driver.findElement(boton).click();
+		driver.navigate().to("https://localhost:8081/usuarios");
+	}
+	
+	static public void destacar2(WebDriver driver) {		
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr/td[4]/a[1]"));
+		elementos.get(0).click();
 	}
 	
 
