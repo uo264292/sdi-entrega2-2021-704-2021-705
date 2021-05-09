@@ -5,6 +5,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import com.uniovi.tests.util.SeleniumUtils;
+
 
 public class PO_PrivateView extends PO_NavView{
 	static public void fillFormAddMark(WebDriver driver, int userOrder, String descriptionp, String scorep)
@@ -24,6 +26,11 @@ public class PO_PrivateView extends PO_NavView{
 		By boton = By.className("btn");
 		driver.findElement(boton).click();	
 	}
+	
+	static public String dinero(WebDriver driver) {
+		WebElement money = driver.findElement(By.id("dineroLi"));		
+		return money.getText().split(":")[1];
+	}
 
 	static public void signup(WebDriver driver, String emailp, String namep, String surnamep, String passwordp, String passwordRp) {
 		clickOptionId(driver, "signup", "id");
@@ -36,10 +43,7 @@ public class PO_PrivateView extends PO_NavView{
 	static public void logout(WebDriver driver) {
 		clickOptionId(driver, "logout", "id");
 	}
-	static public String getMoney(WebDriver driver) {
-		WebElement money = driver.findElement(By.id("mDinero"));		
-		return money.toString().split(":")[1];
-	}
+	
 
 
 }

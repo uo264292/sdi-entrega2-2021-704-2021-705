@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 
+
 public class PO_OffersView extends PO_NavView{
 
 	public static void addOffer(WebDriver driver, String titulop, String detallesp, double preciop, boolean destacadap) {
@@ -33,60 +34,46 @@ public class PO_OffersView extends PO_NavView{
 		driver.findElement(boton).click();	
 		
 	}
-	
-	static public void deleteOfferByName(WebDriver driver, String oferta) {		
-		clickOptionId(driver, "mOfertas", "id");		
-		clickOptionId(driver, "del"+oferta, "id");
+	static public void deleteLastOffer(WebDriver driver) {		
+		driver.navigate().to("https://localhost:8081/ofertas/propias");
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div/table/tbody[1]/tr"));
+		int n = elementos.size();
+		String s = "/html/body/div/div/table/tbody[1]/tr[" + (n) + "]/td[4]/a[2]";
+		List<WebElement> elementos2 = driver.findElements(By.xpath(s));
+		elementos2.get(0).click();
 	}
 	
-	static public void deleteOfferByFirstPosition(WebDriver driver) {		
-		clickOptionId(driver, "mOfertas", "id");
-		
-		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div/form/table/tbody[1]/tr/th[5]/a"));
+	static public void deleteOffer1(WebDriver driver) {		
+		driver.navigate().to("https://localhost:8081/ofertas/propias");
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div/table/tbody[1]/tr/td[4]/a[2]"));
 		elementos.get(0).click();
 	}
 	
-	static public String getOfferByFirstPosition(WebDriver driver) {		
+	static public String getOffer1(WebDriver driver) {		
 		clickOptionId(driver, "mOfertas", "id");
 		
 		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div/form/table/tbody[1]/tr/th[1]"));
 		return elementos.get(0).getText();
 	}
 	
-	static public void searchOfferByName(WebDriver driver, String offer) {		
-		clickOptionId(driver, "mTienda", "id");
-		
-		WebElement barraBusqueda = driver.findElement(By.id("searchBar"));
-		barraBusqueda.click();
-		barraBusqueda.clear();
-		barraBusqueda.sendKeys(offer);
-		
-		WebElement botonBusqueda = driver.findElement(By.id("searchButton"));
-		botonBusqueda.click();
-	}
-	
-	static public int countRowsSearch(WebDriver driver) {		
-		clickOptionId(driver, "mTienda", "id");
-		int offers = 0;
-		
-		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//a[contains(@class, 'page-link')]");
-		for(int i=0;i<elementos.size();i++) {
-			elementos.get(i).click();
-			offers+=driver.findElements(By.className("row")).size();
-		}
-		return offers;
-	}
-	
 	static public void buyOfferByName(WebDriver driver, String offer) {		
 		searchOfferByName(driver,offer);
 		
-		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div[2]/div[1]/div/div[2]/div/h5/a"));
+		List<WebElement> elementos = driver.findElements(By.xpath("/html/body/div/div[3]/table/tbody/tr/td[4]/a[1]"));
 		elementos.get(0).click();
+	
+		
 	}
 	
-	static public void highlightOfferByName(WebDriver driver, String offer) {		
-		clickOptionId(driver, "mOfertas", "id");
-		clickOptionId(driver, "des"+offer, "id");
+	static public void searchOfferByName(WebDriver driver, String offer) {		
+		driver.navigate().to("https://localhost:8081/ofertas");		
+		WebElement barraBusqueda = driver.findElement(By.id("busqueda"));
+		barraBusqueda.click();
+		barraBusqueda.clear();
+		barraBusqueda.sendKeys(offer);
+		WebElement botonBusqueda = driver.findElement(By.id("botonBusqueda"));
+		botonBusqueda.click();
 	}
+	
 
 }
