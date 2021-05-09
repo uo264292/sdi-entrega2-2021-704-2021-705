@@ -45,8 +45,9 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
     });
+
     app.get("/ofertas/destacadas", function (req, res) {
-        let criterio = {"destacada": "true"};
+        let criterio = {destacar: true};
 
         gestorBD.obtenerOferta(criterio, function (ofertas) {
             if (ofertas == null) {
@@ -221,8 +222,6 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
     });
-
-
 
     app.get('/oferta/destacar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };

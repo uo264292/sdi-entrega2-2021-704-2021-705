@@ -30,6 +30,7 @@
             </td>
             {% elif !oferta.comprada and oferta.destacar%}
             <td>Destacada</td>
+            <td><a href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a></td>
             {% else %}
             <td>
                 <a href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
