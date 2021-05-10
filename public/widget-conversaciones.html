@@ -1,0 +1,77 @@
+<div id="widget-conversaciones" >
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      Chat de Wallapop
+    </tr>
+    </thead>
+    <tbody id="tablaCuerpo">
+    </tbody>
+  </table>
+</div>
+
+<script>
+  var conversaciones;
+  function cargarConversaciones(){
+    $.ajax({
+      url: URLbase + "/conversaciones",
+      type: "GET",
+      data: { },
+      dataType: 'json',
+      headers: { "token": token },
+      success: function(respuesta) {
+        conversaciones = respuesta;
+        actualizarTabla(conversaciones);
+      },
+      error : function (error){
+        $( "#contenedor-principal" ).load("widget-login.html");
+      }
+    });
+  }
+  function actualizarTabla(converMostrar){
+    if(converMostrar[0].interesado == undefined ){
+    }
+    else {
+      $("#tablaCuerpo").empty();
+      for (i = 0; i < converMostrar.length; i++) {
+        $("#tablaCuerpo").append(
+                "<tr id=" + converMostrar[i]._id + ">" +
+                "<td>" + converMostrar[i].oferta.titulo + "</td>" +
+                "<td>Vendedor:  " + converMostrar[i].vendedor + "</td>" +
+                "<td> " + converMostrar[i].oferta.precio + "€</td>" +
+                "<td><a onclick=widgetConversacion('" + converMostrar[i].oferta._id + "')>Ver</a></td>" +
+                "<td><a onclick=eliminar('" + converMostrar[i]._id + "')>Eliminar</a></td>" +
+                "</tr>");
+      }
+    }
+  }
+
+  function widgetConversacion(_id){
+    idOfertaConversacion = _id;
+    $( "#contenedor-principal" ).load( "widget-conversacion.html");
+  }
+
+  function eliminar(_id){
+    id = _id
+    $.ajax({
+      url: URLbase + "/conversacion/" + id,
+      type: "DELETE",
+      headers: { "token": token },
+      success : function(respuesta){
+        $( "#contenedor-principal" ).load("widget-conversaciones.html");
+      },
+      error : function(error){
+        $("#widget-login")
+                .prepend("<div class='alert alert-danger'>Usuario no identificado</div>");
+      }
+    });
+  }
+
+
+
+  setInterval(function() {
+    cargarConversaciones(); }, 1000);
+
+  cargarConversaciones();
+
+</script>

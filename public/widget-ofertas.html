@@ -17,7 +17,6 @@
 </div>
 
 <script>
-  window.history.pushState("", "", "/cliente.html?w=ofertas");
   var ofertas;
   function cargarOfertas() {
     $.ajax({
@@ -48,11 +47,19 @@
                 "<td>" + ofertasMostrar[i].detalles + "</td>" +
                 "<td>" + ofertasMostrar[i].precio + "</td>" +
                 "<td>" + ofertasMostrar[i].usuario + "</td>" +
+                "<td><a onclick=widgetConversacion('"+ofertasMostrar[i]._id+"')> Contactar</a></td>" +
                 "</tr>");
       }
     }
   }
 
+  function widgetConversacion(_id){
+    idOfertaConversacion = _id;
+    $( "#contenedor-principal" ).load( "widget-conversacion.html");
+  }
   cargarOfertas();
+
+
+
 </script>
 
