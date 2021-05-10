@@ -1,10 +1,21 @@
 let express = require('express');
 let app = express();
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
+    // Debemos especificar todas las headers que se aceptan. Content-Type , token
+    next();
+});
+
 let jwt = require('jsonwebtoken');
 app.set('jwt',jwt);
 let fs = require('fs');
 let https = require('https');
+var rest = require('request');
+app.set('rest',rest);
 
 let expressSession = require('express-session');
 app.use(expressSession({
@@ -12,6 +23,7 @@ app.use(expressSession({
     resave: true,
     saveUninitialized: true
 }));
+app.use(express.static('public'));
 let crypto = require('crypto');
 let fileUpload = require('express-fileupload');
 app.use(fileUpload());
