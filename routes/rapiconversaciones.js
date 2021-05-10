@@ -42,6 +42,10 @@ module.exports = function (app, gestorBD) {
                     }
                 });
             }
+        });
+
+
+    });
 
             function converNueva(criterio, mensaje, req, res) {
                 let conversacion = {
@@ -56,7 +60,7 @@ module.exports = function (app, gestorBD) {
                             error: "se ha producido un error"
                         })
                     } else {
-                        let conversacionId = {"conversacion": result}
+                        conversacionId = {"conversacion": result}
                         let mensajeNuevo = Object.assign(mensaje, conversacionId);
                         gestorBD.insertarMensaje(mensajeNuevo, function (id) {
                             if (id == null) {
@@ -200,9 +204,4 @@ module.exports = function (app, gestorBD) {
                 })
             });
 
-
-        });
-
-
-    });
 }
