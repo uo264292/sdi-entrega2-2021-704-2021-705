@@ -37,7 +37,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 let gestorBD = require("./modules/gestorBD.js");
 gestorBD.init(app,mongo);
 
-
+let log4js = require("log4js");
+let logger = log4js.getLogger();
+logger.level="info";
 
 
 // routerUsuarioToken
@@ -149,10 +151,10 @@ app.use("/usuario/eliminar",routerUsuarioRol);
 
 
 //Rutas/controladores por lógica
-require("./routes/rusuarios.js")(app, swig,gestorBD);
-require("./routes/rofertas.js")(app,swig,gestorBD);
-require("./routes/rapiwallapop.js")(app,gestorBD);
-require("./routes/rapiconversaciones.js")(app,gestorBD);
+require("./routes/rusuarios.js")(app, swig,gestorBD,logger);
+require("./routes/rofertas.js")(app,swig,gestorBD,logger);
+require("./routes/rapiwallapop.js")(app,gestorBD,logger);
+require("./routes/rapiconversaciones.js")(app,gestorBD,logger);
 app.get('/', function (req, res) {
     res.redirect('/identificarse');
 })

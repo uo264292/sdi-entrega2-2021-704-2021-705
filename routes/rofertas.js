@@ -1,4 +1,4 @@
-module.exports = function(app, swig, gestorBD) {
+module.exports = function(app, swig, gestorBD, logger) {
 
 
     app.get("/ofertas",function(req,res) {
@@ -41,6 +41,7 @@ module.exports = function(app, swig, gestorBD) {
                         dinero: req.session.dinero,
                         actual : pg
                     });
+                logger.info("Se ha accedido a la lista de ofertas.");
                 res.send(respuesta);
             }
         });
@@ -59,6 +60,7 @@ module.exports = function(app, swig, gestorBD) {
                         dinero: req.session.dinero,
                         ofertas : ofertas
                     });
+                logger.info("Se ha accedido a la lista de ofertas destacadas.");
                 res.send(respuesta);
             }
         });
@@ -77,6 +79,7 @@ module.exports = function(app, swig, gestorBD) {
                         dinero: req.session.dinero,
                         ofertas : ofertas
                     });
+                logger.info("Se ha accedido a la lista de ofertas propias.");
                 res.send(respuesta);
             }
         });
@@ -87,6 +90,7 @@ module.exports = function(app, swig, gestorBD) {
             user: req.session.usuario,
             dinero: req.session.dinero
         });
+        logger.info("Se ha accedido a la vista para agregar una oferta.");
         res.send(respuesta);
     });
 
@@ -116,8 +120,10 @@ module.exports = function(app, swig, gestorBD) {
                     res.send("Error al insertar oferta");
                 } else {
                     if (typeof req.body.destacar!=='undefined'){
+                        logger.info("Se ha agregado la oferta " + oferta.titulo +" y se ha destacado.");
                         res.redirect("/oferta/destacar/" + id.toString());
                     } else{
+                        logger.info("Se ha agregado la oferta " + oferta.titulo);
                         res.redirect('/ofertas/propias');
                     }
                 }
@@ -133,6 +139,7 @@ module.exports = function(app, swig, gestorBD) {
             if ( ofertas == null){
                 res.redirect("/ofertas?mensaje=Error al eliminar oferta");
             } else {
+                logger.info("Se ha eliminado la oferta ");
                 res.redirect("/ofertas/propias");
             }
         });
@@ -167,6 +174,7 @@ module.exports = function(app, swig, gestorBD) {
                                     res.send("La oferta no ha podido ser insertada.");
                                 }
                                 else {
+                                    logger.info("Se ha comprado la oferta " + compra.titulo);
                                     let criterio_comprada={"_id":ofertaID};
                                     let oferta = {
                                         comprada : true
@@ -184,6 +192,7 @@ module.exports = function(app, swig, gestorBD) {
                                                 if (result == null) {
                                                     res.send("Error al pagar ");
                                                 } else {
+                                                    logger.info("Se ha cobrado al usuario " + usuario +" " + compra.precio + "€");
                                                     req.session.dinero=dineroTrasCompra;
                                                     res.redirect("/ofertas/compradas");
                                                 }
@@ -218,6 +227,7 @@ module.exports = function(app, swig, gestorBD) {
                         dinero: req.session.dinero,
                         compras : compras
                     });
+                logger.info("Se ha cargado la pagina de ofertas compradas.");
                 res.send(respuesta);
             }
         });
@@ -236,6 +246,7 @@ module.exports = function(app, swig, gestorBD) {
                 if ( result == null){
                     res.redirect("/ofertas/propias?mensaje=Error al destacar oferta");
                 } else {
+                    logger.info("Se ha destacado la oferta");
                     let criterio_usuario = {email:usuario};
                     let dineroTrasDestacar = req.session.dinero-20;
                     let usuarioAModificar = {
@@ -245,6 +256,7 @@ module.exports = function(app, swig, gestorBD) {
                         if (result == null) {
                             res.send("Error al pagar ");
                         } else {
+                            logger.info("Se ha cobrado al usuario " + usuario +" " + 20 + "€");
                             req.session.dinero=dineroTrasDestacar;
                             res.redirect("/ofertas");
                         }

@@ -1,4 +1,4 @@
-module.exports = function(app, swig, gestorBD) {
+module.exports = function(app, swig, gestorBD, logger) {
 
     app.get("/usuarios",function(req,res) {
 
@@ -13,6 +13,7 @@ module.exports = function(app, swig, gestorBD) {
                         user: req.session.usuario,
                         dinero: req.session.dinero
                     });
+                logger.info("Se ha mostrado la lista de usuarios");
                 res.send(respuesta);
             }
         });
@@ -20,6 +21,7 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get("/registrarse", function(req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', {});
+        logger.info("Se ha mostrado la pagina de registro");
         res.send(respuesta);
     });
 
@@ -46,8 +48,10 @@ module.exports = function(app, swig, gestorBD) {
            } else {
                gestorBD.insertarUsuario(usuario, function(id) {
                    if (id == null){
+                       logger.info("Ha dado un error al registrar el nuevo usuario.");
                        res.redirect("/registrarse?mensaje=Error al registrar usuario");
                    } else {
+                       logger.info("Se ha registrado un nuevo usuario cuyo email es: " + usuario.email);
                        req.session.usuario = usuario.email;
                        req.session.dinero = usuario.dinero;
                        res.redirect("/usuarios");
@@ -61,6 +65,7 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get("/identificarse", function(req, res) {
         let respuesta = swig.renderFile('views/bidentificacion.html', {});
+        logger.info("Se ha accedido a la pagina de identificacion");
         res.send(respuesta);
     });
 
@@ -73,12 +78,14 @@ module.exports = function(app, swig, gestorBD) {
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null || usuarios.length == 0) {
+                logger.info("Error durante la identificacion");
                 req.session.usuario = null;
                 res.redirect("/identificarse" +
                     "?mensaje=Email o password incorrecto"+
                     "&tipoMensaje=alert-danger ");
 
             } else {
+                logger.info("El usuario " + usuarios[0].email + " se ha identificado");
                 req.session.usuario = usuarios[0].email;
                 req.session.dinero = usuarios[0].dinero;
                 res.redirect("/usuarios");
@@ -87,6 +94,7 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get('/desconectarse', function (req, res) {
+        logger.info("Usuario desconectado");
         req.session.usuario = null;
         req.session.dinero = null;
         res.redirect("/identificarse");
@@ -104,8 +112,10 @@ module.exports = function(app, swig, gestorBD) {
                     if (ofertas == null|| ofertas.length<=0){
                         gestorBD.eliminarUsuario(criterio,function(usuarios){
                             if ( usuarios == null ){
+                                logger.info("Usuario " + usuarios[0].email + " no se ha podido eliminar");
                                 res.redirect("/usuarios?mensaje=Error al eliminar usuario");
                             } else {
+                                logger.info("Usuario " + usuarios[0].email + " eliminado");
                                 res.redirect("/usuarios");
                             }
                         });
@@ -116,8 +126,11 @@ module.exports = function(app, swig, gestorBD) {
                             } else{
                                 gestorBD.eliminarUsuario(criterio,function(usuarios){
                                     if ( usuarios == null ){
+                                        logger.info("Usuario " + usuarios[0].email + " no se ha eliminado");
                                         res.redirect("/usuarios?mensaje=Error al eliminar usuario");
                                     } else {
+                                        logger.info("Se han eliminado las ofertas del usuario " + usuarios[0].email);
+                                        logger.info("Usuario " + usuarios[0].email + " eliminado");
                                         res.redirect("/usuarios");
                                     }
                                 });
@@ -161,10 +174,12 @@ module.exports = function(app, swig, gestorBD) {
                 if (usuarios == null) {
                     res.redirect("/usuarios?mensaje=Error al eliminar usuario");
                 } else {
+                    logger.info("Usuarios eliminados por el admin");
                     gestorBD.eliminarOferta(criterio_oferta, function (ofertasABorrar) {
                         if (ofertasABorrar == null) {
                             res.send("Paso algo raro");
                         } else {
+                            logger.info("Ofertas de usuarios eliminados por el admin eliminadas");
                             res.redirect("/usuarios");
                         }
                     });

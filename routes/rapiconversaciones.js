@@ -1,4 +1,4 @@
-module.exports = function (app, gestorBD) {
+module.exports = function (app, gestorBD, logger) {
 
 
 
@@ -36,7 +36,7 @@ module.exports = function (app, gestorBD) {
         });
     });
 
-        function insertarMensajeNuevo(mensaje, conversacionId, res) {
+    function insertarMensajeNuevo(mensaje, conversacionId, res) {
         let mensajeNuevo = Object.assign(mensaje, conversacionId);
         gestorBD.insertarMensaje(mensajeNuevo, function (id) {
             if (id == null) {
@@ -44,8 +44,10 @@ module.exports = function (app, gestorBD) {
                 res.json({
                     error: "se ha producido un error"
                 })
+                logger.info("No se ha insertado el nuevo mensaje.");
             } else {
                 res.status(200);
+                logger.info("Se ha insertado un nuevo mensaje.");
                 res.send(JSON.stringify(mensajeNuevo));
             }
         })
@@ -63,7 +65,9 @@ module.exports = function (app, gestorBD) {
                         res.json({
                             error: "se ha producido un error"
                         })
+                        logger.info("No se ha creado la conversacion.");
                     } else {
+                        logger.info("Se ha creado una nueva conversacion.");
                         conversacionId = {"conversacion": result}
                         let mensajeNuevo = Object.assign(mensaje, conversacionId);
                         gestorBD.insertarMensaje(mensajeNuevo, function (id) {
@@ -72,8 +76,10 @@ module.exports = function (app, gestorBD) {
                                 res.json({
                                     error: "se ha producido un error"
                                 })
+                                logger.info("No se ha insertado el nuevo mensaje.");
                             } else {
                                 res.status(200);
+                                logger.info("Se ha insertado el nuevo mensaje.");
                                 res.send(JSON.stringify(mensajeNuevo));
                             }
                         })
@@ -148,6 +154,7 @@ module.exports = function (app, gestorBD) {
                         })
                     } else {
                         res.status(200);
+                        logger.info("El mensaje ha sido leido.");
                         res.send(JSON.stringify(mensajes));
                     }
                 });
@@ -197,6 +204,7 @@ module.exports = function (app, gestorBD) {
                             } else {
                                 let total = conversaciones2.concat(conversaciones);
                                 res.status(200);
+                                logger.info("Se ha accedido a la lista de conversaciones.");
                                 res.send(JSON.stringify(total));
                             }
                         })
@@ -232,6 +240,7 @@ module.exports = function (app, gestorBD) {
                                         })
                                     } else {
                                         res.status(201);
+                                        logger.info("La conversacion ha sido eliminada.");
                                         res.send("Conversación eliminada");
                                     }
                                 })

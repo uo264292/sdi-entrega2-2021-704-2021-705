@@ -1,4 +1,4 @@
-module.exports = function(app, gestorBD) {
+module.exports = function(app, gestorBD, logger) {
 
     app.post("/api/autenticar", function (req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
@@ -14,6 +14,7 @@ module.exports = function(app, gestorBD) {
                     autenticado: false,
                     mensaje: 'Usuario no registrado.'
                 });
+                logger.info("Usuario " + criterio.email + " no es usuario del sistema.");
             } else {
                 req.session.usuario = criterio.email;
                 let token = app.get('jwt').sign({usuario: criterio.email, tiempo: Date.now() / 1000}, "secreto");
@@ -22,6 +23,7 @@ module.exports = function(app, gestorBD) {
                     autenticado: true,
                     token: token
                 });
+                logger.info("Usuario " + req.session.usuario + " identificado");
             }
         });
     });
@@ -40,6 +42,7 @@ module.exports = function(app, gestorBD) {
                 let user = req.session.usuario;
                 let listWithoutUser = ofertas.filter((oferta) => oferta.usuario !== user);
                 res.status(200);
+                logger.info("Se ha mostrado la lista de ofertas ajenas.");
                 res.send(JSON.stringify(listWithoutUser));
             }
         });
