@@ -1,6 +1,7 @@
 let express = require('express');
 let app = express();
 
+//headers
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Credentials", "true");
@@ -24,19 +25,24 @@ app.use(expressSession({
     saveUninitialized: true
 }));
 app.use(express.static('public'));
+
 let crypto = require('crypto');
 let fileUpload = require('express-fileupload');
 app.use(fileUpload());
+
 let mongo = require('mongodb');
 let swig = require('swig');
+
+//body parser
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+// gestorBD
 let gestorBD = require("./modules/gestorBD.js");
 gestorBD.init(app,mongo);
 
+// logger
 let log4js = require("log4js");
 let logger = log4js.getLogger();
 logger.level="info";
@@ -74,9 +80,9 @@ routerUsuarioToken.use(function(req, res, next) {
         });
     }
 });
+
 // Aplicar routerUsuarioToken
 app.use('/api/ofertas/ajenas', routerUsuarioToken);
-
 app.use('/api/mensaje', routerUsuarioToken);
 app.use('/api/mensajes', routerUsuarioToken);
 app.use('/api/conversaciones', routerUsuarioToken);
@@ -96,6 +102,7 @@ routerUsuarioSession.use(function(req, res, next) {
         res.redirect("/identificarse");
     }
 });
+
 //Aplicar routerUsuarioSession
 app.use("/oferta/agregar",routerUsuarioSession);
 app.use("/ofertas",routerUsuarioSession);
@@ -112,6 +119,7 @@ routerUsuarioAutor.use(function(req, res, next) {
     console.log("routerUsuarioAutor");
     let path = require('path');
     let id = path.basename(req.originalUrl);
+
 // Cuidado porque req.params no funciona
 // en el router si los params van en la URL.
     gestorBD.obtenerOferta(
@@ -124,6 +132,7 @@ routerUsuarioAutor.use(function(req, res, next) {
             }
         })
 });
+
 //Aplicar routerUsuarioAutor
 app.use("/oferta/modificar",routerUsuarioAutor);
 app.use("/oferta/eliminar",routerUsuarioAutor);
@@ -143,6 +152,7 @@ routerUsuarioRol.use(function(req, res, next) {
     });
 
 });
+
 //Aplicar routerUsuarioRol
 app.use("/usuarios",routerUsuarioRol);
 app.use("/usuarios/eliminar",routerUsuarioRol);
@@ -164,6 +174,7 @@ app.set('port', 8081);
 app.set('db','mongodb://admin:sdi@wallapop-shard-00-00.emuii.mongodb.net:27017,wallapop-shard-00-01.emuii.mongodb.net:27017,wallapop-shard-00-02.emuii.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-10h1zi-shard-0&authSource=admin&retryWrites=true&w=majority');
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
+
 
 https.createServer({
     key: fs.readFileSync('certificates/alice.key'),
