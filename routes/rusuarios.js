@@ -1,5 +1,7 @@
 module.exports = function(app, swig, gestorBD, logger) {
 
+    //Metodo que busca en la base de datos (usando el gestorDB) todos los usuarios y se los envia
+    // a la vista usuarios.html ademas le pasa el user y el dinero.
     app.get("/usuarios",function(req,res) {
 
         let criterio = {};
@@ -19,12 +21,16 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     });
 
+    //Metodo que carga la vista de registro.
     app.get("/registrarse", function(req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', {});
         logger.info("Se ha mostrado la pagina de registro");
         res.send(respuesta);
     });
 
+    //Metodo que recupera del cuerpo de la vista de registro los datos necesarios para insertar un nuevo
+    //usuario en la base de datos. Se comprueba que los datos introducidos cumplan los paramettros
+    //establecidos. Ademas todos se inicializan como usuario estandar y con 100€ en el monedero.
     app.post('/registrarse', function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -63,12 +69,17 @@ module.exports = function(app, swig, gestorBD, logger) {
 
     });
 
+    //Metodo que carga la vista de identificacion de usuario.
     app.get("/identificarse", function(req, res) {
         let respuesta = swig.renderFile('views/bidentificacion.html', {});
         logger.info("Se ha accedido a la pagina de identificacion");
         res.send(respuesta);
     });
 
+    //Metodo que recupera de la vista de identificacion el usuario y la contraseña, los compara con los de la base
+    //de datos y si estos coinciden con algun usuario, se accede a la vista de usuarios en caso de ser admin
+    //y a la vista de ofertas en caso de ser usuario con rol estandar. Tambien se añaden el dinero y el email
+    //a la session.
     app.post("/identificarse", function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -93,6 +104,7 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     });
 
+    //Desconecta al usuario identificado y carga la vista de identificacion.
     app.get('/desconectarse', function (req, res) {
         logger.info("Usuario desconectado");
         req.session.usuario = null;
@@ -100,6 +112,9 @@ module.exports = function(app, swig, gestorBD, logger) {
         res.redirect("/identificarse");
     });
 
+    //Metodo que en funcion del id recibido recupera al usuario de la base de datos, si no coincide
+    //no se puede borrar, si coincide se mira si tiene creadas ofertas, si no las tiene se elimina el usuario
+    //y si las tiene, se eliminan primero las ofertas y luego el usuario.
     app.get('/usuario/eliminar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
 
@@ -144,6 +159,8 @@ module.exports = function(app, swig, gestorBD, logger) {
 
     });
 
+    //Metodo post para eliminar usuarios de forma multiple si tienen ofertas asignadas estas
+    //son eliminadas tambien.
     app.post('/usuarios/eliminar', function (req, res) {
         let usuarios = req.body.usuarios;
         let criterio_usuario = {};
