@@ -29,25 +29,27 @@ module.exports = function (app, gestorBD) {
                     } else {
                         conversacionId = {"conversacion": gestorBD.mongo.ObjectID(conversaciones[0]._id)}
 
-                        let mensajeNuevo = Object.assign(mensaje, conversacionId);
-                        gestorBD.insertarMensaje(mensajeNuevo, function (id) {
-                            if (id == null) {
-                                res.status(500);
-                                res.json({
-                                    error: "se ha producido un error"
-                                })
-                            } else {
-                                res.status(200);
-                                res.send(JSON.stringify(mensajeNuevo));
-                            }
-                        })
+                        insertarMensajeNuevo(mensaje, conversacionId, res);
                     }
                 });
             }
         });
-
-
     });
+
+        function insertarMensajeNuevo(mensaje, conversacionId, res) {
+        let mensajeNuevo = Object.assign(mensaje, conversacionId);
+        gestorBD.insertarMensaje(mensajeNuevo, function (id) {
+            if (id == null) {
+                res.status(500);
+                res.json({
+                    error: "se ha producido un error"
+                })
+            } else {
+                res.status(200);
+                res.send(JSON.stringify(mensajeNuevo));
+            }
+        })
+    }
 
     function converNueva(criterio, mensaje, req, res) {
                 let conversacion = {

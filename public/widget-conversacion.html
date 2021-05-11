@@ -26,21 +26,26 @@
 
 <script>
   var mensajes;
+  actualizar = true;
   function cargarMensajes(){
+    if(actualizar)
     $.ajax({
-      url: URLbase + "/mensajes/"+ idOfertaConversacion,
+      url: URLbase + "/mensajes/" +idOfertaConversacion,
       type: "GET",
       data: { },
       dataType: 'json',
       headers: { "token": token },
       success: function(respuesta) {
         mensajes = respuesta;
+        console.log(idOfertaConversacion);
         actualizarTabla(mensajes);
       },
       error : function (error){
         $( "#contenedor-principal" ).load("widget-login.html");
       }
     });
+    else
+      clearInterval(cargarMensajes)
   }
   function actualizarTabla(mensajesMostrar){
     if(mensajesMostrar[0].mensaje !== undefined){
@@ -84,6 +89,6 @@
 
   cargarMensajes();
   setInterval(function() {
-    cargarMensajes(); }, 1000);
+    cargarMensajes(); }, 3000);
 
 </script>
