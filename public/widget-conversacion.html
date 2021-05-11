@@ -27,6 +27,8 @@
 <script>
   var mensajes;
   actualizar = true;
+  var myVar = setInterval(function() {
+    cargarMensajes(); }, 3000);
   function cargarMensajes(){
     if(actualizar)
     $.ajax({
@@ -45,9 +47,10 @@
       }
     });
     else
-      clearInterval(cargarMensajes)
+      clearInterval(myVar)
   }
   function actualizarTabla(mensajesMostrar){
+    console.log(actualizar);
     if(mensajesMostrar[0].mensaje !== undefined){
       $("#tablaCuerpo").empty(); // Vaciar la tabla
       for (i=0; i<mensajesMostrar.length; i++) {
@@ -87,8 +90,7 @@
       return "leído";
   }
 
-  cargarMensajes();
-  setInterval(function() {
-    cargarMensajes(); }, 3000);
+
+
 
 </script>
