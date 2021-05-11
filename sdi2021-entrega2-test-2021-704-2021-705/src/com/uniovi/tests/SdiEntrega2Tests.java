@@ -634,7 +634,7 @@ public class SdiEntrega2Tests {
 
 	}
 
-	// PR032 Inicio de sesión con datos válidos (campo email o contraseña vacíos). /
+	// PR032 Inicio de sesión con datos inválidos (campo email o contraseña vacíos). /
 	@Test
 	public void PR32() {
 		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
@@ -655,7 +655,7 @@ public class SdiEntrega2Tests {
 
 		PO_LoginView.fillForm(driver, "candela@gmail.com", "");
 
-		assertNotNull(PO_View.checkElement(driver, "text", "Usuario no encontrado"));
+		assertNotNull(PO_View.checkElement(driver, "text", "Hay campos vacios"));
 
 	}
 
@@ -748,7 +748,7 @@ public class SdiEntrega2Tests {
 		elementoss.get(0).click();
 		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
 		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
-		List<WebElement> elementos2 = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
 		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
 	}
 
@@ -915,10 +915,9 @@ public class SdiEntrega2Tests {
 		List<WebElement> elementos1 = driver.findElements(By.xpath("/html/body/nav/div/div[2]/ul[2]/li/a"));
 		elementos1.get(0).click();
 
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
-		List<WebElement> elementos2 = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr/td[5]/a"));
+		List<WebElement> elementos2 = PO_NavView.checkElement(driver, "text", "Eliminar");
 		elementos2.get(0).click();
-		SeleniumUtils.esperarSegundos(driver, 20);
+		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, "of1", 2);
 	}
 
 	// PR038 Sobre el listado de conversaciones ya abiertas. Pinchar el enlace
@@ -926,7 +925,68 @@ public class SdiEntrega2Tests {
 	// comprobar que el listado se actualiza correctamente. /
 	@Test
 	public void PR38() {
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
 
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
+		PO_PrivateView.logout(driver);
+		PO_PrivateView.login(driver, "sergio@gmail.com", "12345");
+		PO_OffersView.addOffer(driver, "of2", "para la habitacion", 57.0, false);
+		PO_PrivateView.logout(driver);
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos.size(), 2);
+
+		List<WebElement> elementoss = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "of1" + "')]/following-sibling::*/a");
+		elementoss.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		
+		List<WebElement> elementos11 = driver.findElements(By.xpath("/html/body/nav/div/div[2]/ul[1]/li/a"));
+		elementos11.get(0).click();
+		
+		List<WebElement> elementosAux = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "of2" + "')]/following-sibling::*/a");
+		elementosAux.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		
+		List<WebElement> elementos1 = driver.findElements(By.xpath("/html/body/nav/div/div[2]/ul[2]/li/a"));
+		elementos1.get(0).click();
+
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		List<WebElement> elementos2 = PO_NavView.checkElement(driver, "text", "Eliminar");
+		elementos2.get(1).click();
+		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, "of2", 2);
 	}
 
 	// PR039 Identificarse en la aplicación y enviar un mensaje a una oferta,
@@ -938,6 +998,67 @@ public class SdiEntrega2Tests {
 	// leído. /
 	@Test
 	public void PR39() {
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
 
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
+		PO_PrivateView.logout(driver);
+		PO_PrivateView.login(driver, "sergio@gmail.com", "12345");
+		PO_OffersView.addOffer(driver, "of2", "para la habitacion", 57.0, false);
+		PO_PrivateView.logout(driver);
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos.size(), 2);
+
+		List<WebElement> elementoss = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "of1" + "')]/following-sibling::*/a");
+		elementoss.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		
+		driver.manage().deleteAllCookies();
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "admin@admin.com", "admin");
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		
+		List<WebElement> elementos1 = driver.findElements(By.xpath("/html/body/nav/div/div[2]/ul[2]/li/a"));
+		elementos1.get(0).click();
+		
+		
+		List<WebElement> elementos3 = PO_NavView.checkElement(driver, "text", "Ver");
+		elementos3.get(0).click();
+
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		assertNotNull(PO_View.checkElement(driver, "text", "leído"));
 	}
 }

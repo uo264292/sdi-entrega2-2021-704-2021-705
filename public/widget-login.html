@@ -23,6 +23,7 @@
 <script>
   actualizar = false;
   $("#boton-login").click(function (){
+    if(comprobarNoVacio())
     $.ajax({
       url: URLbase + "/autenticar",
       type: "POST",
@@ -44,5 +45,14 @@
 
     });
   });
-
+  function comprobarNoVacio(){
+    let email = $("#email").val()
+    let password = $("#password").val()
+    if(email.length==0 || password.length==0) {
+      $("#widget-login")
+              .prepend("<div class='alert alert-danger'>Hay campos vacios</div>");
+      return false;
+    }
+    return true;
+  }
 </script>

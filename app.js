@@ -89,7 +89,7 @@ var routerUsuarioSession = express.Router();
 routerUsuarioSession.use(function(req, res, next) {
     console.log("routerUsuarioSession");
     if ( req.session.usuario ) {
-        // dejamos correr la petición
+        let respuesta = {identificado: true};
         next();
     } else {
         console.log("va a : "+req.session.destino)
