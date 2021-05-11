@@ -3,7 +3,7 @@ module.exports = function (app, gestorBD, logger) {
 
     //Metodo que crea un mensaje nuevo recibe desde el cliente un id correspondiente
     //a una oferta.
-    app.post("/api/mensajes/:id/nuevo", function (req, res) {
+    app.post("/api/mensajes/:id/nuevoMensaje", function (req, res) {
          let mensaje = {
             "mensaje": req.body.mensaje,
             "leer": false,

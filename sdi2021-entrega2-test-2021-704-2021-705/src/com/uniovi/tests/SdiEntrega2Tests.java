@@ -50,45 +50,16 @@ public class SdiEntrega2Tests {
 	@Before
 	public void setUp() {
 		driver.navigate().to(URL);
-
-	}
-
-	@After
-	public void tearDown() {
-		driver.manage().deleteAllCookies();
-	}
-
-	@BeforeClass
-	static public void begin() {
-		// COnfiguramos las pruebas.
-		// Fijamos el timeout en cada opciÃ³n de carga de una vista. 2 segundos.
-		PO_View.setTimeout(3);
 		MongoClient mongoClient = MongoClients.create(
 				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
 
 		database.getCollection("ofertas").drop();
 		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
 		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-
-	}
-
-	@AfterClass
-	static public void end() {
-		// Cerramos el navegador al finalizar las pruebas
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("test");
-
-		driver.quit();
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "admin"));
-	}
-
-	// PR01. Registro de usuario con datos validos/
-	@Test
-	public void PR01() {
+		
 		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
 		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
 			PO_PrivateView.logout(driver);
@@ -102,7 +73,40 @@ public class SdiEntrega2Tests {
 				PO_PrivateView.logout(driver);
 			}
 		}
+	}
 
+	@After
+	public void tearDown() {
+		driver.manage().deleteAllCookies();
+	}
+
+	@BeforeClass
+	static public void begin() {
+		// COnfiguramos las pruebas.
+		// Fijamos el timeout en cada opciÃ³n de carga de una vista. 2 segundos.
+		PO_View.setTimeout(3);
+		
+
+	}
+
+	@AfterClass
+	static public void end() {
+		// Cerramos el navegador al finalizar las pruebas
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("test");
+
+		driver.quit();
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+	}
+
+	// PR01. Registro de usuario con datos validos/
+	@Test
+	public void PR01() {
 		String email = "candela" + Math.random() * 6 + "@gmail.com";
 		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
 		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas"));
@@ -585,19 +589,6 @@ public class SdiEntrega2Tests {
 	// PR030. Inicio de sesión con datos válidos. /
 	@Test
 	public void PR30() {
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
 
 		driver.navigate().to("https://localhost:8081/cliente.html");
 
@@ -612,20 +603,7 @@ public class SdiEntrega2Tests {
 	// incorrecta). /
 	@Test
 	public void PR31() {
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
-
+		
 		driver.navigate().to("https://localhost:8081/cliente.html");
 
 		PO_LoginView.fillForm(driver, "candela@gmail.com", "jajaja");
@@ -637,20 +615,7 @@ public class SdiEntrega2Tests {
 	// PR032 Inicio de sesión con datos inválidos (campo email o contraseña vacíos). /
 	@Test
 	public void PR32() {
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
-
+		
 		driver.navigate().to("https://localhost:8081/cliente.html");
 
 		PO_LoginView.fillForm(driver, "candela@gmail.com", "");
@@ -664,26 +629,7 @@ public class SdiEntrega2Tests {
 	// existen, menos las del usuario identificado. /
 	@Test
 	public void PR33() {
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
-
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
+		
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		PO_OffersView.addOffer(driver, "cama", "para la habitacion", 229.0, false);
 		PO_PrivateView.logout(driver);
@@ -707,28 +653,6 @@ public class SdiEntrega2Tests {
 	// mensaje aparece en el listado de mensajes. /
 	@Test
 	public void PR34() {
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
-
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("conversaciones").drop();
-		database.getCollection("mensajes").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
 		PO_PrivateView.logout(driver);
@@ -757,28 +681,6 @@ public class SdiEntrega2Tests {
 	// Comprobar que el mensaje aparece en el listado de mensajes. /
 	@Test
 	public void PR35() {
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
-
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("conversaciones").drop();
-		database.getCollection("mensajes").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
 		PO_PrivateView.logout(driver);
@@ -817,28 +719,6 @@ public class SdiEntrega2Tests {
 	// conversaciones que deben ser. /
 	@Test
 	public void PR36() {
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
-
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("conversaciones").drop();
-		database.getCollection("mensajes").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
 		PO_PrivateView.logout(driver);
@@ -871,28 +751,6 @@ public class SdiEntrega2Tests {
 	// comprobar que el listado se actualiza correctamente. /
 	@Test
 	public void PR37() {
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
-
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("conversaciones").drop();
-		database.getCollection("mensajes").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
 		PO_PrivateView.logout(driver);
@@ -925,28 +783,6 @@ public class SdiEntrega2Tests {
 	// comprobar que el listado se actualiza correctamente. /
 	@Test
 	public void PR38() {
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
-
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("conversaciones").drop();
-		database.getCollection("mensajes").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
 		PO_PrivateView.logout(driver);
@@ -998,28 +834,6 @@ public class SdiEntrega2Tests {
 	// leído. /
 	@Test
 	public void PR39() {
-		MongoClient mongoClient = MongoClients.create(
-				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
-
-		database.getCollection("ofertas").drop();
-		database.getCollection("compras").drop();
-		database.getCollection("conversaciones").drop();
-		database.getCollection("mensajes").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
-		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
-		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-			PO_PrivateView.logout(driver);
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		} else {
-			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
-			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
-				PO_PrivateView.logout(driver);
-			}
-		}
 		PO_PrivateView.login(driver, "admin@admin.com", "admin");
 		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
 		PO_PrivateView.logout(driver);
