@@ -1,5 +1,6 @@
 package com.uniovi.tests;
 
+import java.util.ArrayList;
 //Paquetes Java
 import java.util.List;
 import java.util.Random;
@@ -11,18 +12,22 @@ import org.junit.runners.MethodSorters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 //Paquetes Selenium 
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.*;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.*;
+import org.bson.Document;
 
 //Ordenamos las pruebas por el nombre del mÃ©todo
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -45,8 +50,7 @@ public class SdiEntrega2Tests {
 	@Before
 	public void setUp() {
 		driver.navigate().to(URL);
-		
-		
+
 	}
 
 	@After
@@ -65,7 +69,7 @@ public class SdiEntrega2Tests {
 
 		database.getCollection("ofertas").drop();
 		database.getCollection("compras").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol","estandar"));
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
 
 	}
 
@@ -76,11 +80,10 @@ public class SdiEntrega2Tests {
 				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 		MongoDatabase database = mongoClient.getDatabase("test");
 
-		
 		driver.quit();
 		database.getCollection("ofertas").drop();
 		database.getCollection("compras").drop();
-		database.getCollection("usuarios").deleteMany(Filters.eq("rol","admin"));
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "admin"));
 	}
 
 	// PR01. Registro de usuario con datos validos/
@@ -99,7 +102,7 @@ public class SdiEntrega2Tests {
 				PO_PrivateView.logout(driver);
 			}
 		}
-		
+
 		String email = "candela" + Math.random() * 6 + "@gmail.com";
 		PO_PrivateView.signup(driver, email, "Candela", "Bobes", "12345", "12345");
 		assertNotNull(PO_View.checkElement(driver, "text", "Lista De Ofertas"));
@@ -579,16 +582,362 @@ public class SdiEntrega2Tests {
 		PO_PrivateView.logout(driver);
 	}
 
-	// PR030. Sin hacer /
+	// PR030. Inicio de sesión con datos válidos. /
 	@Test
 	public void PR30() {
-		assertTrue("PR30 sin hacer", false);
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+
+		assertNotNull(PO_View.checkElement(driver, "text", "Ofertas disponibles"));
+
+		PO_PrivateView.logout2(driver);
 	}
 
-	// PR031. Sin hacer /
+	// PR031. Inicio de sesión con datos inválidos (email existente, pero contraseña
+	// incorrecta). /
 	@Test
 	public void PR31() {
-		assertTrue("PR31 sin hacer", false);
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "jajaja");
+
+		assertNotNull(PO_View.checkElement(driver, "text", "Usuario no encontrado"));
+
 	}
 
+	// PR032 Inicio de sesión con datos válidos (campo email o contraseña vacíos). /
+	@Test
+	public void PR32() {
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "");
+
+		assertNotNull(PO_View.checkElement(driver, "text", "Usuario no encontrado"));
+
+	}
+
+	// PR033 Mostrar el listado de ofertas disponibles y comprobar que se muestran
+	// todas las que
+	// existen, menos las del usuario identificado. /
+	@Test
+	public void PR33() {
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
+
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		PO_OffersView.addOffer(driver, "cama", "para la habitacion", 229.0, false);
+		PO_PrivateView.logout(driver);
+		PO_PrivateView.login(driver, "sergio@gmail.com", "12345");
+		PO_OffersView.addOffer(driver, "mesita", "para la habitacion", 57.0, false);
+		PO_PrivateView.logout(driver);
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos.size(), 2);
+
+	}
+
+	// PR034 Sobre una búsqueda determinada de ofertas (a elección de
+	// desarrollador), enviar un
+	// mensaje a una oferta concreta. Se abriría dicha conversación por primera vez.
+	// Comprobar que el
+	// mensaje aparece en el listado de mensajes. /
+	@Test
+	public void PR34() {
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
+
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
+		PO_PrivateView.logout(driver);
+		PO_PrivateView.login(driver, "sergio@gmail.com", "12345");
+		PO_OffersView.addOffer(driver, "of2", "para la habitacion", 57.0, false);
+		PO_PrivateView.logout(driver);
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos.size(), 2);
+
+		List<WebElement> elementoss = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "of1" + "')]/following-sibling::*/a");
+		elementoss.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
+		List<WebElement> elementos2 = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+	}
+
+	// PR035 Sobre el listado de conversaciones enviar un mensaje a una conversación
+	// ya abierta.
+	// Comprobar que el mensaje aparece en el listado de mensajes. /
+	@Test
+	public void PR35() {
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
+
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
+		PO_PrivateView.logout(driver);
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos.size(), 1);
+
+		List<WebElement> elementoss = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "of1" + "')]/following-sibling::*/a");
+		elementoss.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		
+		List<WebElement> elementos1 = driver.findElements(By.xpath("/html/body/nav/div/div[2]/ul[2]/li/a"));
+		elementos1.get(0).click();
+
+		List<WebElement> elementos3 = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "admin@admin.com" + "')]/following-sibling::*/a");
+		elementos3.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "vuelvo a ser candela");
+
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: vuelvo a ser candela"));
+	}
+
+	// PR036 Mostrar el listado de conversaciones ya abiertas. Comprobar que el
+	// listado contiene las
+	// conversaciones que deben ser. /
+	@Test
+	public void PR36() {
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
+
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
+		PO_PrivateView.logout(driver);
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos.size(), 1);
+
+		List<WebElement> elementoss = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "of1" + "')]/following-sibling::*/a");
+		elementoss.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		
+		List<WebElement> elementos1 = driver.findElements(By.xpath("/html/body/nav/div/div[2]/ul[2]/li/a"));
+		elementos1.get(0).click();
+
+		List<WebElement> elementos2 = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos2.size(), 1);
+	}
+
+	// PR037 Sobre el listado de conversaciones ya abiertas. Pinchar el enlace
+	// Eliminar de la primera y
+	// comprobar que el listado se actualiza correctamente. /
+	@Test
+	public void PR37() {
+		MongoClient mongoClient = MongoClients.create(
+				"mongodb+srv://admin:sdi@wallapop.emuii.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+		MongoDatabase database = mongoClient.getDatabase("myFirstDatabase");
+
+		database.getCollection("ofertas").drop();
+		database.getCollection("compras").drop();
+		database.getCollection("conversaciones").drop();
+		database.getCollection("mensajes").drop();
+		database.getCollection("usuarios").deleteMany(Filters.eq("rol", "estandar"));
+		PO_PrivateView.signup(driver, "candela@gmail.com", "Candela", "Bobes", "12345", "12345");
+		if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+			PO_PrivateView.logout(driver);
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		} else {
+			PO_PrivateView.signup(driver, "sergio@gmail.com", "Sergio", "Cimadevilla", "12345", "12345");
+			if (SeleniumUtils.textoEnPagina(driver, "Desconectar")) {
+				PO_PrivateView.logout(driver);
+			}
+		}
+		PO_PrivateView.login(driver, "admin@admin.com", "admin");
+		PO_OffersView.addOffer(driver, "of1", "para la habitacion", 229.0, false);
+		PO_PrivateView.logout(driver);
+
+		driver.navigate().to("https://localhost:8081/cliente.html");
+
+		PO_LoginView.fillForm(driver, "candela@gmail.com", "12345");
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr",
+				PO_View.getTimeout());
+		assertEquals(elementos.size(), 1);
+
+		List<WebElement> elementoss = PO_View.checkElement(driver, "free",
+				"//td[contains(text(), '" + "of1" + "')]/following-sibling::*/a");
+		elementoss.get(0).click();
+		assertNotNull(PO_View.checkElement(driver, "text", "Chat de Wallapop"));
+		PO_PrivateView.fillFormMensaje(driver, "hola soy candela");
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		assertNotNull(PO_View.checkElement(driver, "text", "candela@gmail.com}: hola soy candela"));
+		
+		List<WebElement> elementos1 = driver.findElements(By.xpath("/html/body/nav/div/div[2]/ul[2]/li/a"));
+		elementos1.get(0).click();
+
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", 40);
+		List<WebElement> elementos2 = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr/td[5]/a"));
+		elementos2.get(0).click();
+		SeleniumUtils.esperarSegundos(driver, 20);
+	}
+
+	// PR038 Sobre el listado de conversaciones ya abiertas. Pinchar el enlace
+	// Eliminar de la última y
+	// comprobar que el listado se actualiza correctamente. /
+	@Test
+	public void PR38() {
+
+	}
+
+	// PR039 Identificarse en la aplicación y enviar un mensaje a una oferta,
+	// validar que el mensaje
+	// enviado aparece en el chat. Identificarse después con el usuario propietario
+	// de la oferta y validar
+	// que tiene un mensaje sin leer, entrar en el chat y comprobar que el mensaje
+	// pasa a tener el estado
+	// leído. /
+	@Test
+	public void PR39() {
+
+	}
 }

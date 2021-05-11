@@ -43,7 +43,21 @@ public class PO_PrivateView extends PO_NavView{
 	static public void logout(WebDriver driver) {
 		clickOptionId(driver, "logout", "id");
 	}
+
+	public static void logout2(WebDriver driver) {
+		driver.manage().deleteAllCookies();
+		driver.navigate().to("https://localhost:8081/cliente.html");
+		
+	}
 	
+	static public void fillFormMensaje(WebDriver driver, String mensaje) {
+		WebElement dni = driver.findElement(By.id("mensaje"));
+		dni.click();
+		dni.clear();
+		dni.sendKeys(mensaje);
+		By boton = By.className("btn");
+		driver.findElement(boton).click();	
+	}
 
 
 }
