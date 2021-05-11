@@ -1,6 +1,6 @@
 module.exports = function(app, swig, gestorBD, logger) {
 
-
+    //Metodo que manda la lista de ofertas paginadas  a la vista de ofertas.
     app.get("/ofertas",function(req,res) {
 
         //Creo el criterio de busqueda, mas abajo indico que si me llega algun tipo de
@@ -47,6 +47,8 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     });
 
+    //Metodo que recupera las ofertas que tienen el atributo destacar a true y las manda a
+    //la vista de ofertas destacadas.
     app.get("/ofertas/destacadas", function (req, res) {
         let criterio = {destacar: true};
 
@@ -66,6 +68,8 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     })
 
+    //Metodo que recupera las ofertas creadas por el usuario que se encuentra en sesion
+    //y las manda a la vista de ofertas propias.
     app.get("/ofertas/propias",function(req,res) {
 
         let criterio = {usuario : req.session.usuario};
@@ -85,6 +89,7 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     });
 
+    //Metodo que recupera la vista para agregar una oferta.
     app.get('/oferta/agregar', function (req,res){
         let respuesta = swig.renderFile('views/addOferta.html',{
             user: req.session.usuario,
@@ -94,6 +99,9 @@ module.exports = function(app, swig, gestorBD, logger) {
         res.send(respuesta);
     });
 
+    //Metodo que recupera del cuerpo de la vista de agregar oferta los valores
+    //necesarios para crearla en la base de datos, se realizan las comprobaciones
+    //pertinentes para que los datos sigan el formato adecuado.
     app.post('/oferta/agregar', function (req,res){
 
     var fecha = new Date();
@@ -132,6 +140,8 @@ module.exports = function(app, swig, gestorBD, logger) {
         }
     });
 
+    //Metodo que a traves del id de la oferta la recupera de la base de datos, si existe es eliminada
+    //si no existe en la base no se puede eliminar.
     app.get('/oferta/eliminar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
 
@@ -145,6 +155,9 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     });
 
+    //Metodo que a traves del id de la oferta, primero la recupera de la base de datos
+    //si existe y cumple el requisito de la funcion sepuedecomprar esta oferta cambia el atrinuto
+    //comprada a true, y decrementa el dinero del usuario.
     app.get('/oferta/comprar/:id', function (req, res) {
         let ofertaID = gestorBD.mongo.ObjectID(req.params.id);
         let usuario = req.session.usuario;
@@ -214,6 +227,8 @@ module.exports = function(app, swig, gestorBD, logger) {
 
     });
 
+    //Metodo que recupera de la base de datos las ofertas que han sido compradas por el usuario
+    //activo en sesion y las manda a la vista de ofertas compradas.
     app.get("/ofertas/compradas",function(req,res) {
 
         let criterio = {usuario : req.session.usuario};
@@ -233,6 +248,8 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     });
 
+    //Metodo que a traves del id recupera la oferta de la base de datos si es que esta existe
+    //cambia el atributo destacar a true y modifica el dinero del usuario restandole 20€.
     app.get('/oferta/destacar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
         let usuario = req.session.usuario;
@@ -270,6 +287,8 @@ module.exports = function(app, swig, gestorBD, logger) {
 
     });
 
+    //Funcion que comprueba si la oferta se puede comprar, osea que no sea una oferta propia
+    //o una oferta ya comprada.
     function sePuedeComprar(usuario, ofertaId, funcionCallback){
         let criterio_usuario = {$and : [{"_id": ofertaId},{"usuario":usuario}]};
         let criterio_comprada = {$and : [{"ofertaId": ofertaId},{"usuario":usuario}]};
