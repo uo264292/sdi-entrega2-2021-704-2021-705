@@ -1,5 +1,8 @@
 module.exports = function(app, gestorBD, logger) {
 
+    //Metodo que recupera del cuerpo de la vista del cliente, el usuario y la contraseña
+    //comprueba si esta en la base de datos, si esto es asi crea un token unico de sesion
+    //y sino indica al usuario que no esta registrado.
     app.post("/api/autenticar", function (req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
         let criterio = {
@@ -28,6 +31,8 @@ module.exports = function(app, gestorBD, logger) {
         });
     });
 
+    //Metodo que recupera todas las ofertas de la base de datos menos aquellas
+    //que son suyas.
     app.get("/api/ofertas/ajenas", function (req, res){
 
         let criterio= {};

@@ -1,7 +1,8 @@
 module.exports = function (app, gestorBD, logger) {
 
 
-
+    //Metodo que crea un mensaje nuevo recibe desde el cliente un id correspondiente
+    //a una oferta.
     app.post("/api/mensajes/:id/nuevo", function (req, res) {
          let mensaje = {
             "mensaje": req.body.mensaje,
@@ -36,6 +37,7 @@ module.exports = function (app, gestorBD, logger) {
         });
     });
 
+    //Funcion que inserta en la base de datos un mensaje nuevo.
     function insertarMensajeNuevo(mensaje, conversacionId, res) {
         let mensajeNuevo = Object.assign(mensaje, conversacionId);
         gestorBD.insertarMensaje(mensajeNuevo, function (id) {
@@ -51,8 +53,9 @@ module.exports = function (app, gestorBD, logger) {
                 res.send(JSON.stringify(mensajeNuevo));
             }
         })
-    }
+    };
 
+    //Funcion que crea una conversacion nueva en la base de datos.
     function converNueva(criterio, mensaje, req, res) {
                 let conversacion = {
                     "vendedor": criterio.oferta.usuario,
@@ -86,8 +89,10 @@ module.exports = function (app, gestorBD, logger) {
                     }
                 })
 
-            }
+            };
 
+    //Metodo que recupera los mensajes de una conversacion e indica
+    //si estos han sido leidos.
     app.get("/api/mensajes/:id", function (req, res) {
                 let criterioOferta = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
                 gestorBD.obtenerOferta(criterioOferta,function (ofertas){
@@ -125,6 +130,8 @@ module.exports = function (app, gestorBD, logger) {
                 });
             });
 
+    //Funcion que indica si el usuario activo es el vendedor o el interesado en
+    //funcion a una oferta.
     function esVendedor(oferta,req) {
         let criterio;
         if (req.session.usuario === oferta.usuario ) {
@@ -133,7 +140,9 @@ module.exports = function (app, gestorBD, logger) {
             criterio = {"oferta": oferta, "interesado": req.session.usuario};
         }
         return criterio;
-    }
+    };
+
+    //Funcion que indica si un mensaje ha sido leido.
     function mensajeALeido(idConversacion, req, res) {
         let mensajeLeido = {"leer": true}
         let criterioSinLeer = {$and: [{"leer": false}, {"conversacion": gestorBD.mongo.ObjectID(idConversacion)}, {"emisor": {$ne: req.session.usuario}}]};
@@ -160,8 +169,9 @@ module.exports = function (app, gestorBD, logger) {
                 });
             }
         });
-    }
+    };
 
+    //Metodo que modifica un mensaje poniendo su propiedad de leido a true.
     app.get("/api/mensaje/:id/leer", function (req, res) {
                 let criterio = {
                     "_id": gestorBD.mongo.ObjectID(req.params.id)
@@ -190,6 +200,8 @@ module.exports = function (app, gestorBD, logger) {
                 })
             });
 
+    //Metodo que nos devuelve una lista con las conversaciones del usuario en sesion
+    //ya sea como vendedor o como interesado.
     app.get("/api/conversaciones", function (req, res) {
                 let criterio = {interesado: req.session.usuario};
                 let criterio2 = {vendedor: req.session.usuario};
@@ -211,6 +223,8 @@ module.exports = function (app, gestorBD, logger) {
                     }
                 });
             });
+
+    //Metodo que borra una conversacion cuyo id es introducido en la url.
     app.delete("/api/conversacion/:id", function (req, res) {
                 let criterio = {
                     "_id": gestorBD.mongo.ObjectID(req.params.id)
@@ -249,6 +263,9 @@ module.exports = function (app, gestorBD, logger) {
                     }
                 })
             });
+
+    //Funcion que sirve para comprobar que la fecha esta en el formato correcto, retorna una cadena
+    //correspondiente a la fecha.
     function fechaFormatoCorrecto(date) {
         let f = new Date(date);
         console.log(date);
@@ -262,5 +279,5 @@ module.exports = function (app, gestorBD, logger) {
         else{
             return cadena + f.getMinutes();
         }
-    }
+    };
 }
